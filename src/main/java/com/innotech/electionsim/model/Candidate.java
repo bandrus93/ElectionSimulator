@@ -8,25 +8,9 @@ public class Candidate {
     private final List<Stat> stats = new ArrayList<>();
     private long votesReceived = 0L;
     private int swayScore;
-    private static final List<Candidate> candidates = new ArrayList<>();
 
     private Candidate() {
 
-    }
-
-    public static List<Candidate> getCandidates() {
-        return candidates;
-    }
-
-    public static String printCandidateList() {
-        StringBuilder sb = new StringBuilder(DisplayManager.CANDIDATE_LIST_HEADING);
-        for (int i = 0; i < candidates.size(); i++) {
-            sb.append(i + 1).append(" - ").append(candidates.get(i).getName()).append("\n");
-            if (i == candidates.size() - 1) {
-                sb.append("\n");
-            }
-        }
-        return sb.toString();
     }
 
     public String getName() {

@@ -11,6 +11,7 @@ public class DisplayManager {
     public static final String MAIN_MENU = "\n1 - Start New Election";
     public static final String INVALID_NUMBER_INPUT = "Please enter a valid number";
     public static final String INVALID_COMMAND = "Invalid command";
+    public static final String POPULATION_PROMPT = "Enter the total number of registered voters:";
     public static final String POPULATION_COMMAND_LIST = """
             You may adjust population metrics by entering the following commands:
             To slightly shift alignment left or right, type 'l' or 'r', respectively;

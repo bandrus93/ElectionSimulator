@@ -1,6 +1,6 @@
 package com.innotech.electionsim;
 
-import com.innotech.electionsim.controller.Campaign;
+import com.innotech.electionsim.controller.ElectionRunner;
 import org.springframework.boot.Banner;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.WebApplicationType;
@@ -10,7 +10,7 @@ import org.springframework.context.ApplicationContext;
 
 @SpringBootApplication
 public class ElectionSimApplication implements CommandLineRunner {
-	private static final Campaign campaign = Campaign.getInstance();
+	private static final ElectionRunner campaign = ElectionRunner.getInstance();
 
 	@SuppressWarnings("unused")
 	public static void main(String[] args) {

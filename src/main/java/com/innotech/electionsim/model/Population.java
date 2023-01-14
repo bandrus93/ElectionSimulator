@@ -20,17 +20,22 @@ public class Population {
     private final LinkedList<PopulationSegment> segments = new LinkedList<>();
     private final long registeredVoters;
 
-    public Population(long registeredVoters) {
+    private Population(long registeredVoters) {
         this.registeredVoters = registeredVoters;
-        segments.add(new PopulationSegment(Segment.RADICAL_LEFT, Math.round(registeredVoters * 0.025)));
-        segments.add(new PopulationSegment(Segment.FAR_LEFT, Math.round(registeredVoters * 0.05)));
-        segments.add(new PopulationSegment(Segment.MODERATE_LEFT, Math.round(registeredVoters * 0.091)));
-        segments.add(new PopulationSegment(Segment.CENTRE_LEFT, Math.round(registeredVoters * 0.167)));
-        segments.add(new PopulationSegment(Segment.CENTRIST, Math.round(registeredVoters * .334)));
-        segments.add(new PopulationSegment(Segment.CENTRE_RIGHT, Math.round(registeredVoters * .167)));
-        segments.add(new PopulationSegment(Segment.MODERATE_RIGHT, Math.round(registeredVoters * 0.091)));
-        segments.add(new PopulationSegment(Segment.FAR_RIGHT, Math.round(registeredVoters * 0.05)));
-        segments.add(new PopulationSegment(Segment.RADICAL_RIGHT, Math.round(registeredVoters * 0.025)));
+    }
+
+    public static Population getInstance(long registeredVoters) {
+        Population population = new Population(registeredVoters);
+        population.segments.add(new PopulationSegment(Segment.RADICAL_LEFT, Math.round(registeredVoters * 0.025)));
+        population.segments.add(new PopulationSegment(Segment.FAR_LEFT, Math.round(registeredVoters * 0.05)));
+        population.segments.add(new PopulationSegment(Segment.MODERATE_LEFT, Math.round(registeredVoters * 0.091)));
+        population.segments.add(new PopulationSegment(Segment.CENTRE_LEFT, Math.round(registeredVoters * 0.167)));
+        population.segments.add(new PopulationSegment(Segment.CENTRIST, Math.round(registeredVoters * .334)));
+        population.segments.add(new PopulationSegment(Segment.CENTRE_RIGHT, Math.round(registeredVoters * .167)));
+        population.segments.add(new PopulationSegment(Segment.MODERATE_RIGHT, Math.round(registeredVoters * 0.091)));
+        population.segments.add(new PopulationSegment(Segment.FAR_RIGHT, Math.round(registeredVoters * 0.05)));
+        population.segments.add(new PopulationSegment(Segment.RADICAL_RIGHT, Math.round(registeredVoters * 0.025)));
+        return population;
     }
 
     public Long getTotalPopulation() {
