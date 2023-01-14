@@ -1,5 +1,6 @@
 package com.innotech.electionsim.controller;
 
+import com.innotech.electionsim.data.ElectionSettings;
 import com.innotech.electionsim.model.Campaign;
 import com.innotech.electionsim.model.Candidate;
 import com.innotech.electionsim.view.DisplayManager;
@@ -8,31 +9,37 @@ import java.util.*;
 
 public class ElectionRunner {
     private static final ElectionRunner instance = new ElectionRunner();
+    private ElectionSettings settings;
     private final Scanner uiController;
 
     private ElectionRunner() {
         uiController = UserInterface.getInputReader();
     }
 
-    public static ElectionRunner getInstance() {
+    public static ElectionRunner getInstance(ElectionSettings settings) {
+        instance.settings = settings;
+        DisplayManager.setUserSettings(settings);
         return instance;
     }
 
     public void start() {
         boolean isActiveSession = true;
-        System.out.println(DisplayManager.GREETING_MESSAGE + DisplayManager.MAIN_MENU);
+        System.out.println(DisplayManager.getGreetingMessage() + DisplayManager.MAIN_MENU);
         do {
             String input = uiController.nextLine();
             switch (input) {
                 case "1" -> {
                     newElection();
                 }
+                case "3" -> {
+                    settings.update(uiController);
+                }
                 case "q" -> {
                     isActiveSession = false;
                 }
                 default -> System.out.println("Invalid selection");
             }
-            String message = isActiveSession ? DisplayManager.GREETING_MESSAGE + DisplayManager.MAIN_MENU : "See you soon!";
+            String message = isActiveSession ? DisplayManager.getGreetingMessage() + DisplayManager.MAIN_MENU : "See you soon!";
             System.out.println(message);
         } while (isActiveSession);
     }
@@ -63,41 +70,33 @@ public class ElectionRunner {
                     case "+" -> {
                         campaign.addCandidate();
                     }
-                    case "p" -> {
-                        PriorityQueue<Candidate> pluralityResult = campaign.runElection(Campaign.ElectionType.PLURALITY);
-                        DisplayManager.printElectionResult(pluralityResult, campaign.getPopulation().getTotalPopulation());
-                        //Refactor 'clear' into save functionality
-                        //Candidate.getCandidates().clear();
-                        return;
-                    }
                     case "r" -> {
-                        List<Candidate> eliminated = new ArrayList<>();
-                        do {
-                            PriorityQueue<Candidate> preliminaryResult = campaign.runElection(Campaign.ElectionType.INSTANT_RUNOFF);
-                            Object[] preliminaryArr = preliminaryResult.toArray();
-                            Candidate leader = (Candidate) preliminaryArr[preliminaryArr.length - 1];
-                            if (leader.getTotalVotes() / Double.parseDouble(campaign.getPopulation().getTotalPopulation().toString()) > 0.5) {
-                                DisplayManager.printElectionResult(preliminaryResult, campaign.getPopulation().getTotalPopulation());
-                                DisplayManager.appendResults(preliminaryResult, eliminated);
-                                //Refactor 'clear' into save functionality
-                                //Candidate.getCandidates().clear();
-                                return;
-                            } else {
-                                Candidate loser = (Candidate) preliminaryArr[0];
-                                campaign.getCandidates().remove(loser);
-                                eliminated.add(loser);
-                                for (Candidate candidate : campaign.getCandidates()) {
-                                    candidate.resetVotes();
+                        String electionType = settings.getType();
+                        if (!electionType.equals(ElectionSettings.ElectionType.INSTANT_RUNOFF.toString())) {
+                            PriorityQueue<Candidate> electionResult = campaign.runElection(electionType);
+                            DisplayManager.printElectionResult(electionResult, campaign.getPopulation().getTotalPopulation());
+                        } else {
+                            List<Candidate> eliminated = new ArrayList<>();
+                            do {
+                                PriorityQueue<Candidate> preliminaryResult = campaign.runElection(electionType);
+                                Object[] preliminaryArr = preliminaryResult.toArray();
+                                Candidate leader = (Candidate) preliminaryArr[preliminaryArr.length - 1];
+                                if (leader.getTotalVotes() / Double.parseDouble(campaign.getPopulation().getTotalPopulation().toString()) > 0.5) {
+                                    DisplayManager.printElectionResult(preliminaryResult, campaign.getPopulation().getTotalPopulation());
+                                    DisplayManager.appendResults(preliminaryResult, eliminated);
+                                    //Refactor 'clear' into save functionality
+                                    //Candidate.getCandidates().clear();
+                                    return;
+                                } else {
+                                    Candidate loser = (Candidate) preliminaryArr[0];
+                                    campaign.getCandidates().remove(loser);
+                                    eliminated.add(loser);
+                                    for (Candidate candidate : campaign.getCandidates()) {
+                                        candidate.resetVotes();
+                                    }
                                 }
-                            }
-                        } while (true);
-                    }
-                    case "a" -> {
-                        PriorityQueue<Candidate> approvalResult = campaign.runElection(Campaign.ElectionType.APPROVAL);
-                        DisplayManager.printElectionResult(approvalResult, campaign.getPopulation().getTotalPopulation());
-                        //Refactor 'clear' into save functionality
-                        //Candidate.getCandidates().clear();
-                        return;
+                            } while (true);
+                        }
                     }
                     default -> System.out.println(DisplayManager.INVALID_COMMAND);
                 }

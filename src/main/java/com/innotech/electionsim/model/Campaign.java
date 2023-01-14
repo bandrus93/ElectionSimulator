@@ -3,6 +3,7 @@ package com.innotech.electionsim.model;
 import com.innotech.electionsim.controller.ApprovalComparator;
 import com.innotech.electionsim.controller.ElectionComparator;
 import com.innotech.electionsim.controller.UserInterface;
+import com.innotech.electionsim.data.ElectionSettings;
 import com.innotech.electionsim.view.DisplayManager;
 
 import java.util.ArrayList;
@@ -11,11 +12,6 @@ import java.util.PriorityQueue;
 import java.util.Scanner;
 
 public class Campaign {
-    public enum ElectionType {
-        PLURALITY,
-        INSTANT_RUNOFF,
-        APPROVAL
-    }
     private Population population;
     private final List<Candidate> candidates;
     private final Scanner uiController;
@@ -65,7 +61,7 @@ public class Campaign {
         return sb.toString();
     }
 
-    public PriorityQueue<Candidate> runElection(ElectionType electionType) {
+    public PriorityQueue<Candidate> runElection(String electionType) {
         PriorityQueue<Candidate> electionResult = new PriorityQueue<>(new ElectionComparator());
         for (PopulationSegment segment : population.getSegments()) {
             int segmentPosition = population.getSegments().indexOf(segment);
@@ -76,7 +72,7 @@ public class Campaign {
                     eligibles.add(candidate);
                 }
             }
-            if ((electionType.equals(ElectionType.PLURALITY) || electionType.equals(ElectionType.INSTANT_RUNOFF)) && !eligibles.isEmpty()) {
+            if ((!electionType.equals(ElectionSettings.ElectionType.APPROVAL.toString())) && !eligibles.isEmpty()) {
                 Integer totalSway = 0;
                 for (Candidate eligible : eligibles) {
                     totalSway += eligible.getSwayScore();

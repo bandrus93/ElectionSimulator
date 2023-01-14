@@ -1,6 +1,7 @@
 package com.innotech.electionsim;
 
 import com.innotech.electionsim.controller.ElectionRunner;
+import com.innotech.electionsim.data.ElectionSettings;
 import org.springframework.boot.Banner;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.WebApplicationType;
@@ -8,9 +9,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
 
+import java.io.IOException;
+
 @SpringBootApplication
 public class ElectionSimApplication implements CommandLineRunner {
-	private static final ElectionRunner campaign = ElectionRunner.getInstance();
 
 	@SuppressWarnings("unused")
 	public static void main(String[] args) {
@@ -23,6 +25,12 @@ public class ElectionSimApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) {
-		campaign.start();
+		try {
+			ElectionSettings savedSettings = ElectionSettings.load();
+			ElectionRunner campaign = ElectionRunner.getInstance(savedSettings);
+			campaign.start();
+		} catch (IOException e) {
+			System.out.println("Unable to load election settings; aborting start...");
+		}
 	}
 }
