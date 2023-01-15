@@ -1,1 +1,1 @@
-{"locale":"Arlandia","race":"GENERAL","type":"PLURALITY","electionDay":"NULL"}
+{"locale":"Berlundy","race":"PRESIDENTIAL","type":"PLURALITY","electionDay":"NULL"}

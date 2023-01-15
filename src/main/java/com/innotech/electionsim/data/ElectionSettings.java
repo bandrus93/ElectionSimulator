@@ -3,9 +3,9 @@ package com.innotech.electionsim.data;
 import com.google.gson.Gson;
 import com.innotech.electionsim.view.DisplayManager;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.Iterator;
 import java.util.Scanner;
 
 public class ElectionSettings {
@@ -35,9 +35,9 @@ public class ElectionSettings {
     }
 
     public static ElectionSettings load() throws IOException {
-        Scanner settingsData = new Scanner(Paths.get("../../../../../../resources/election_settings.txt"));
+        Scanner settingsData = new Scanner(Paths.get("src/main/resources/election_settings.txt"));
         Gson gson = new Gson();
-        return gson.fromJson(settingsData.toString(), ElectionSettings.class);
+        return gson.fromJson(settingsData.next(), ElectionSettings.class);
     }
 
     public String getLocale() {
@@ -125,11 +125,27 @@ public class ElectionSettings {
                     System.out.println(DisplayManager.DATE_PROMPT);
                     setElectionDay(uiController.nextLine());
                 }
-                case "s" -> {updating = false;}
+                case "s" -> {
+                    save();
+                    updating = false;
+                }
                 default -> {
                     System.out.println(DisplayManager.INVALID_COMMAND);
                 }
             }
+            if (updating) {
+                System.out.println(DisplayManager.getCurrentSettingsMenu() + DisplayManager.SETTINGS_PROMPT);
+            }
         } while (updating);
+    }
+
+    private void save() {
+        try (FileWriter settings = new FileWriter("src/main/resources/election_settings.txt")) {
+            Gson gson = new Gson();
+            String updatedJson = gson.toJson(this);
+            settings.write(updatedJson);
+        } catch (IOException e) {
+            System.out.println("Save Error: Unable to save settings");
+        }
     }
 }

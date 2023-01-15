@@ -64,8 +64,9 @@ public class DisplayManager {
     }
 
     public static String getCurrentSettingsMenu() {
-        String electionDay = userSettings.getElectionDay().equals("NULL") ? Calendar.getInstance().get(Calendar.DAY_OF_MONTH) + "-" + Calendar.getInstance().get(Calendar.MONTH) + "-" + Calendar.getInstance().get(Calendar.YEAR) : userSettings.getElectionDay();
-        return "\n1 - Locale: " + userSettings.getLocale() +
+        String electionDay = userSettings.getElectionDay().equals("NULL") ? Calendar.getInstance().get(Calendar.DAY_OF_MONTH) + "-" + (Calendar.getInstance().get(Calendar.MONTH) + 1) + "-" + Calendar.getInstance().get(Calendar.YEAR) : userSettings.getElectionDay();
+        return "\nCurrentCampaign:" +
+                "\n1 - Locale: " + userSettings.getLocale() +
                 "\n2 - Race Type: " + userSettings.getRace() +
                 "\n3 - Election Type: " + userSettings.getType() +
                 "\n4 - Election Day: " + electionDay + "\n";
@@ -79,7 +80,8 @@ public class DisplayManager {
 
     public static void printElectionResult(PriorityQueue<Candidate> result, Long totalPop) {
         Object[] resultArr = result.toArray();
-        System.out.println("Election Results:\n");
+        String electionYear = userSettings.getElectionDay().equals("NULL") ? String.valueOf(Calendar.getInstance().get(Calendar.YEAR)) : userSettings.getElectionDay().split("-")[2];
+        System.out.println(userSettings.getLocale() + " " + userSettings.getRace() + " Election " + electionYear + "\n");
         System.out.printf("%-30.30s %-30.30s %-30.30s\n", "Candidate", "Popular Votes", "Percentage of Total");
         for (int i = resultArr.length - 1; i >= 0; i--) {
             Candidate next = (Candidate) resultArr[i];
