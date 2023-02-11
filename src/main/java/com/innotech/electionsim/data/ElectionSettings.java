@@ -37,7 +37,7 @@ public class ElectionSettings {
     public static ElectionSettings load() throws IOException {
         Scanner settingsData = new Scanner(Paths.get("src/main/resources/election_settings.txt"));
         Gson gson = new Gson();
-        return gson.fromJson(settingsData.next(), ElectionSettings.class);
+        return gson.fromJson(settingsData.nextLine(), ElectionSettings.class);
     }
 
     public String getLocale() {
@@ -76,7 +76,7 @@ public class ElectionSettings {
         StringBuilder menuBuilder = new StringBuilder();
         int counter = 1;
         for (RaceType val : RaceType.values()) {
-            menuBuilder.append(counter).append(" - ").append(val.toString());
+            menuBuilder.append(counter).append(" - ").append(val.toString()).append("\n");
             counter++;
         }
         return menuBuilder.toString();
@@ -86,7 +86,7 @@ public class ElectionSettings {
         StringBuilder menuBuilder = new StringBuilder();
         int counter = 1;
         for (ElectionType val : ElectionType.values()) {
-            menuBuilder.append(counter).append(" - ").append(val.toString());
+            menuBuilder.append(counter).append(" - ").append(val.toString()).append("\n");
             counter++;
         }
         return menuBuilder.toString();

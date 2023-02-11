@@ -2,10 +2,9 @@ package com.innotech.electionsim.view;
 
 import com.innotech.electionsim.data.ElectionSettings;
 import com.innotech.electionsim.model.Candidate;
+import com.innotech.electionsim.model.ElectionResult;
 
-import java.util.Calendar;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.util.*;
 
 public class DisplayManager {
     private static ElectionSettings userSettings;
@@ -53,6 +52,9 @@ public class DisplayManager {
     public static final String RACE_PROMPT = "Enter the number corresponding to the race type:";
     public static final String ELECTION_PROMPT = "Enter the number corresponding to the election type:";
     public static final String DATE_PROMPT = "Enter the date the election is to be held (in DD-MM-YYYY format):";
+    public static final String SAVE_PROMPT = "Would you like to save this election result? (y/n):";
+    public static final String EMPTY_SAVE_MESSAGE = "No saved elections found.";
+    public static final String VIEW_RESULT_PROMPT = "Enter the number corresponding to a saved election to view that election's outcome (or enter 'x' to return to the main menu):";
 
     public static void setUserSettings(ElectionSettings settings) {
         userSettings = settings;
@@ -65,7 +67,7 @@ public class DisplayManager {
 
     public static String getCurrentSettingsMenu() {
         String electionDay = userSettings.getElectionDay().equals("NULL") ? Calendar.getInstance().get(Calendar.DAY_OF_MONTH) + "-" + (Calendar.getInstance().get(Calendar.MONTH) + 1) + "-" + Calendar.getInstance().get(Calendar.YEAR) : userSettings.getElectionDay();
-        return "\nCurrentCampaign:" +
+        return "\nCurrent Campaign:" +
                 "\n1 - Locale: " + userSettings.getLocale() +
                 "\n2 - Race Type: " + userSettings.getRace() +
                 "\n3 - Election Type: " + userSettings.getType() +
@@ -78,26 +80,43 @@ public class DisplayManager {
         System.out.println(reprint);
     }
 
-    public static void printElectionResult(PriorityQueue<Candidate> result, Long totalPop) {
-        Object[] resultArr = result.toArray();
-        String electionYear = userSettings.getElectionDay().equals("NULL") ? String.valueOf(Calendar.getInstance().get(Calendar.YEAR)) : userSettings.getElectionDay().split("-")[2];
-        System.out.println(userSettings.getLocale() + " " + userSettings.getRace() + " Election " + electionYear + "\n");
-        System.out.printf("%-30.30s %-30.30s %-30.30s\n", "Candidate", "Popular Votes", "Percentage of Total");
-        for (int i = resultArr.length - 1; i >= 0; i--) {
-            Candidate next = (Candidate) resultArr[i];
-            String candidateId = (resultArr.length - i) + " - " + next.getName();
-            String popularVotes = next.getTotalVotes().toString();
-            double percentage = (next.getTotalVotes() / Double.parseDouble(totalPop.toString())) * 100;
-            System.out.printf("%-30.30s %-30.30s %-30.30s\n", candidateId, popularVotes, percentage);
+    public static void printSavedResults(List<ElectionResult> resultList) {
+        if (resultList.isEmpty()) {
+            System.out.println(EMPTY_SAVE_MESSAGE);
+        } else {
+            StringBuilder menuBuilder = new StringBuilder();
+            for (ElectionResult result : resultList) {
+                String electionYear = result.getMetaData().getElectionDay().equals("NULL") ? String.valueOf(Calendar.getInstance().get(Calendar.YEAR)) : result.getMetaData().getElectionDay().split("-")[2];
+                menuBuilder.append(resultList.indexOf(result) + 1)
+                        .append(" - ")
+                        .append(result.getMetaData().getLocale())
+                        .append(" ")
+                        .append(result.getMetaData().getRace())
+                        .append(" Election ")
+                        .append(electionYear)
+                        .append("\n");
+            }
+            System.out.println(menuBuilder);
         }
     }
 
-    public static void appendResults(PriorityQueue<Candidate> result, List<Candidate> eliminated) {
-        for (int i = 1; i <= eliminated.size(); i++) {
-            Candidate loser = eliminated.get(i - 1);
-            String candidateId = (result.size() + i) + " - " + loser.getName();
-            String popularVotes = loser.getTotalVotes().toString();
-            System.out.printf("%-30.30s %-30.30s %-30.30s\n", candidateId, popularVotes, "N/A");
+    public static void printElectionResult(ElectionResult result) {
+        List<Candidate> rankings = result.getCandidateRanking();
+        String electionYear = userSettings.getElectionDay().equals("NULL") ? String.valueOf(Calendar.getInstance().get(Calendar.YEAR)) : userSettings.getElectionDay().split("-")[2];
+        System.out.println(userSettings.getLocale() + " " + userSettings.getRace() + " Election " + electionYear + "\n");
+        System.out.printf("%-30.30s %-30.30s %-30.30s\n", "Candidate", "Popular Votes", "Percentage of Total");
+        for (int i = rankings.size() - 1; i >= 0; i--) {
+            Candidate next = rankings.get(i);
+            String candidateId = (rankings.size() - i) + " - " + next.getName();
+            String popularVotes = next.getTotalVotes().toString();
+            double percentage = (next.getTotalVotes() / Double.parseDouble(result.getTotalPopulation().toString())) * 100;
+            StringBuilder meterBuilder = new StringBuilder();
+            Double tallyCount = percentage / 5;
+            int percentCounter = tallyCount.intValue();
+            for (; percentCounter > 0; percentCounter--) {
+                meterBuilder.append("*");
+            }
+            System.out.printf("%-30.30s %-30.30s %-30.30s %-20.20s\n", candidateId, popularVotes, percentage, meterBuilder);
         }
     }
 

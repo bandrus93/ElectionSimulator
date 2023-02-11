@@ -67,7 +67,7 @@ public class Population {
             for (int j = 0; j < interval; j++) {
                 sb.append("*");
             }
-            sb.append("\n").append(currentSegment.getBlockBase()).append("\n");
+            sb.append("\n");
         }
         return sb.toString();
     }

@@ -15,12 +15,10 @@ public class Campaign {
     private Population population;
     private final List<Candidate> candidates;
     private final Scanner uiController;
-    private final Candidate.Builder ballotRegistrar;
 
     public Campaign(Scanner uiController) {
         this.uiController = uiController;
         this.candidates = new ArrayList<>();
-        this.ballotRegistrar = new Candidate.Builder();
     }
 
     public Population getPopulation() {
@@ -38,7 +36,7 @@ public class Campaign {
 
     public void addCandidate() {
         DisplayManager.refresh(DisplayManager.CANDIDATE_NAME_PROMPT);
-        candidates.add(ballotRegistrar
+        candidates.add(new Candidate.Builder()
                 .name(uiController.nextLine())
                 .platform(UserInterface.getAlignment(DisplayManager.CANDIDATE_ALIGNMENT_PROMPT, Population.getSegmentArray()))
                 .energyLevel(UserInterface.getNumericInput(DisplayManager.CANDIDATE_ENERGY_PROMPT))
@@ -61,8 +59,8 @@ public class Campaign {
         return sb.toString();
     }
 
-    public PriorityQueue<Candidate> runElection(String electionType) {
-        PriorityQueue<Candidate> electionResult = new PriorityQueue<>(new ElectionComparator());
+    public ElectionResult runElection(String electionType) {
+        PriorityQueue<Candidate> resultRank = new PriorityQueue<>(new ElectionComparator());
         for (PopulationSegment segment : population.getSegments()) {
             int segmentPosition = population.getSegments().indexOf(segment);
             PriorityQueue<Candidate> eligibles = new PriorityQueue<>(new ApprovalComparator());
@@ -97,7 +95,7 @@ public class Campaign {
                 }
             }
         }
-        electionResult.addAll(candidates);
-        return electionResult;
+        resultRank.addAll(candidates);
+        return new ElectionResult(resultRank, population.getTotalPopulation());
     }
 }
