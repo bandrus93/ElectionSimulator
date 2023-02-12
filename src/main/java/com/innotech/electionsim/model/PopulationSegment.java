@@ -27,6 +27,22 @@ public class PopulationSegment {
         return maxDiff;
     }
 
+    public void castBallots(Iterable<Candidate> eligibles) {
+        int totalSway = computeTotalSway(eligibles);
+        for (Candidate toRank : eligibles) {
+            long votesGained = Math.round(this.blockBase * (toRank.getSwayScore() / Double.parseDouble(Integer.toString(totalSway))));
+            toRank.incrementVotes(votesGained);
+        }
+    }
+
+    private int computeTotalSway(Iterable<Candidate> eligibles) {
+        int totalSway = 0;
+        for (Candidate eligible : eligibles) {
+            totalSway += eligible.getSwayScore();
+        }
+        return totalSway;
+    }
+
     private void setMaxDiff() {
         if (this.voterBlock.equals(Population.Segment.CENTRIST)
         || this.voterBlock.equals(Population.Segment.MODERATE_LEFT)

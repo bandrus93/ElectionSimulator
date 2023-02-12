@@ -62,24 +62,9 @@ public class Campaign {
     public ElectionResult runElection(String electionType) {
         PriorityQueue<Candidate> resultRank = new PriorityQueue<>(new ElectionComparator());
         for (PopulationSegment segment : population.getSegments()) {
-            int segmentPosition = population.getSegments().indexOf(segment);
-            PriorityQueue<Candidate> eligibles = new PriorityQueue<>(new ApprovalComparator());
-            for (Candidate candidate : candidates) {
-                int candidatePosition = candidate.getPositionIndex();
-                if (candidate.isApproved(segmentPosition, candidatePosition, segment.getMaxDiff())) {
-                    eligibles.add(candidate);
-                }
-            }
+            PriorityQueue<Candidate> eligibles = getApprovedCandidateRanking(segment);
             if ((!electionType.equals(ElectionSettings.ElectionType.APPROVAL.toString())) && !eligibles.isEmpty()) {
-                Integer totalSway = 0;
-                for (Candidate eligible : eligibles) {
-                    totalSway += eligible.getSwayScore();
-                }
-                for (Candidate toRank : eligibles) {
-                    long totalVotesReceivable = segment.getBlockBase();
-                    long votesGained = Math.round(totalVotesReceivable * (toRank.getSwayScore() / Double.parseDouble(totalSway.toString())));
-                    toRank.incrementVotes(votesGained);
-                }
+                segment.castBallots(eligibles);
             } else {
                 Object[] approval = eligibles.toArray();
                 if (approval.length > 1) {
@@ -97,5 +82,17 @@ public class Campaign {
         }
         resultRank.addAll(candidates);
         return new ElectionResult(resultRank, population.getTotalPopulation());
+    }
+
+    private PriorityQueue<Candidate> getApprovedCandidateRanking(PopulationSegment segment) {
+        int segmentPosition = population.getSegments().indexOf(segment);
+        PriorityQueue<Candidate> eligibles = new PriorityQueue<>(new ApprovalComparator());
+        for (Candidate candidate : candidates) {
+            int candidatePosition = candidate.getPositionIndex();
+            if (candidate.isApproved(segmentPosition, candidatePosition, segment.getMaxDiff())) {
+                eligibles.add(candidate);
+            }
+        }
+        return eligibles;
     }
 }
