@@ -1,5 +1,7 @@
 package com.innotech.electionsim.model;
 
+import com.innotech.electionsim.data.ElectionSettings;
+
 public class PopulationSegment {
     private final Population.Segment voterBlock;
     private int maxDiff = 3;
@@ -27,9 +29,9 @@ public class PopulationSegment {
         return maxDiff;
     }
 
-    public void castBallots(Iterable<Candidate> eligibles) {
-        int totalSway = computeTotalSway(eligibles);
+    public void castBallots(Iterable<Candidate> eligibles, String electionType) {
         for (Candidate toRank : eligibles) {
+            int totalSway = ElectionSettings.ElectionType.APPROVAL.toString().equals(electionType) ? toRank.getSwayScore() : computeTotalSway(eligibles);
             long votesGained = Math.round(this.blockBase * (toRank.getSwayScore() / Double.parseDouble(Integer.toString(totalSway))));
             toRank.incrementVotes(votesGained);
         }

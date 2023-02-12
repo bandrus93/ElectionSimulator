@@ -3,7 +3,6 @@ package com.innotech.electionsim.model;
 import com.innotech.electionsim.controller.ApprovalComparator;
 import com.innotech.electionsim.controller.ElectionComparator;
 import com.innotech.electionsim.controller.UserInterface;
-import com.innotech.electionsim.data.ElectionSettings;
 import com.innotech.electionsim.view.DisplayManager;
 
 import java.util.ArrayList;
@@ -63,22 +62,7 @@ public class Campaign {
         PriorityQueue<Candidate> resultRank = new PriorityQueue<>(new ElectionComparator());
         for (PopulationSegment segment : population.getSegments()) {
             PriorityQueue<Candidate> eligibles = getApprovedCandidateRanking(segment);
-            if ((!electionType.equals(ElectionSettings.ElectionType.APPROVAL.toString())) && !eligibles.isEmpty()) {
-                segment.castBallots(eligibles);
-            } else {
-                Object[] approval = eligibles.toArray();
-                if (approval.length > 1) {
-                    for (int i = 0; i < approval.length - 1; i++) {
-                        Candidate approved = (Candidate) approval[i];
-                        approved.incrementVotes(segment.getBlockBase());
-                    }
-                } else {
-                    if (approval.length == 1) {
-                        Candidate selected = (Candidate) approval[0];
-                        selected.incrementVotes(segment.getBlockBase());
-                    }
-                }
-            }
+            segment.castBallots(eligibles, electionType);
         }
         resultRank.addAll(candidates);
         return new ElectionResult(resultRank, population.getTotalPopulation());

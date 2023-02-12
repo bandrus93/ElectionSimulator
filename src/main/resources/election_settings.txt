@@ -1,1 +1,1 @@
-{"locale":"Berlundy","race":"PRESIDENTIAL","type":"PLURALITY","electionDay":"NULL"}
+{"locale":"Berlundy","race":"PRESIDENTIAL","type":"APPROVAL","electionDay":"NULL"}
