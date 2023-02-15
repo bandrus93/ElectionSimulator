@@ -1,9 +1,7 @@
 package com.innotech.electionsim.view;
 
 import com.innotech.electionsim.data.ElectionSettings;
-import com.innotech.electionsim.model.Campaign;
-import com.innotech.electionsim.model.Candidate;
-import com.innotech.electionsim.model.ElectionResult;
+import com.innotech.electionsim.model.*;
 
 import java.util.*;
 
@@ -93,6 +91,37 @@ public class DisplayManager {
         return sb.toString();
     }
 
+    public static String printCandidateStats(Candidate candidate) {
+        Iterator<Stat> staterator = candidate.getStats().iterator();
+        StringBuilder sb = new StringBuilder();
+        do {
+            Stat nextStat = staterator.next();
+            sb.append(nextStat.getLabel());
+            if (nextStat.isNumeral()) {
+                sb.append("*".repeat(Math.max(0, Integer.parseInt(nextStat.getValue())))).append("\n");
+            } else {
+                sb.append(nextStat.getValue()).append("\n");
+            }
+            if (!staterator.hasNext()) {
+                sb.append("\n");
+            }
+        } while (staterator.hasNext());
+        return sb.toString();
+    }
+
+    public static String printPopulationGraph(Population population) {
+        StringBuilder sb = new StringBuilder();
+        for (PopulationSegment currentSegment : population.getSegments()) {
+            sb.append(formatGraphLabel(currentSegment.getVoterBlock().toString())).append("|");
+            long interval = Math.floorDiv(Math.round((currentSegment.getBlockBase() / Double.parseDouble(population.getTotalPopulation().toString())) * 100), 5);
+            for (int j = 0; j < interval; j++) {
+                sb.append("*");
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
     public static void printSavedResults(List<ElectionResult> resultList) {
         if (resultList.isEmpty()) {
             System.out.println(EMPTY_SAVE_MESSAGE);
@@ -131,6 +160,18 @@ public class DisplayManager {
             }
             System.out.printf("%-30.30s %-30.30s %-30.30s %-20.20s\n", candidateId, popularVotes, percentage, meterBuilder);
         }
+    }
+
+    private static String formatGraphLabel(String fullName) {
+        StringBuilder sb = new StringBuilder();
+        String[] labelData = fullName.split("_");
+        for (String labelDatum : labelData) {
+            sb.append(labelDatum.toUpperCase(Locale.ROOT).charAt(0));
+            if (labelData.length == 1) {
+                sb.append("T");
+            }
+        }
+        return sb.toString();
     }
 
 }

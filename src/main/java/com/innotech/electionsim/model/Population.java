@@ -60,22 +60,9 @@ public class Population {
         return segments;
     }
 
-    public String printGraph() {
-        StringBuilder sb = new StringBuilder();
-        for (PopulationSegment currentSegment : segments) {
-            sb.append(formatGraphLabel(currentSegment.getVoterBlock().toString())).append("|");
-            long interval = Math.floorDiv(Math.round((currentSegment.getBlockBase() / Double.parseDouble(getTotalPopulation().toString())) * 100), 5);
-            for (int j = 0; j < interval; j++) {
-                sb.append("*");
-            }
-            sb.append("\n");
-        }
-        return sb.toString();
-    }
-
     public void edit() {
         do {
-            switch (UserInterface.getStringInput(printGraph() + DisplayManager.POPULATION_COMMAND_LIST)) {
+            switch (UserInterface.getStringInput(DisplayManager.printPopulationGraph(this) + DisplayManager.POPULATION_COMMAND_LIST)) {
                 case "l": shift("LEFT", 0.013); break;
                 case "r": shift("RIGHT", 0.013); break;
                 case "L": shift("LEFT", 0.05); break;
@@ -90,20 +77,8 @@ public class Population {
                 default:
                     System.out.println("Invalid command");
             }
-            DisplayManager.refresh(printGraph() + DisplayManager.POPULATION_COMMAND_LIST);
+            DisplayManager.refresh(DisplayManager.printPopulationGraph(this) + DisplayManager.POPULATION_COMMAND_LIST);
         } while (true);
-    }
-
-    private String formatGraphLabel(String fullName) {
-        StringBuilder sb = new StringBuilder();
-        String[] labelData = fullName.split("_");
-        for (String labelDatum : labelData) {
-            sb.append(labelDatum.toUpperCase(Locale.ROOT).charAt(0));
-            if (labelData.length == 1) {
-                sb.append("T");
-            }
-        }
-        return sb.toString();
     }
 
     private PopulationSegment getOvertonCenter() {

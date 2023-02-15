@@ -14,6 +14,10 @@ public class Candidate {
 
     }
 
+    public List<Stat> getStats() {
+        return stats;
+    }
+
     public String getName() {
         Stat name = findStatById(DisplayManager.CANDIDTAE_NAME_LABEL);
         return name.getValue() != null ? name.getValue() : "Candidate not found";
@@ -62,7 +66,7 @@ public class Candidate {
     public void edit() {
         boolean editing = true;
         do {
-            String input = UserInterface.getStringInput(printCandidateStats() + DisplayManager.CANDIDATE_EDIT_PROMPT);
+            String input = UserInterface.getStringInput(DisplayManager.printCandidateStats(this) + DisplayManager.CANDIDATE_EDIT_PROMPT);
             String[] edit = input.split(" ");
             switch (edit[0].toUpperCase()) {
                 case "N":
@@ -92,26 +96,8 @@ public class Candidate {
                     System.out.println("Invalid edit command");
             }
             swayScore = computeSwayScore();
-            DisplayManager.refresh(printCandidateStats() + DisplayManager.CANDIDATE_EDIT_PROMPT);
+            DisplayManager.refresh(DisplayManager.printCandidateStats(this) + DisplayManager.CANDIDATE_EDIT_PROMPT);
         } while (editing);
-    }
-
-    private String printCandidateStats() {
-        Iterator<Stat> staterator = stats.iterator();
-        StringBuilder sb = new StringBuilder();
-        do {
-            Stat nextStat = staterator.next();
-            sb.append(nextStat.getLabel());
-            if (nextStat.isNumeral()) {
-                sb.append("*".repeat(Math.max(0, Integer.parseInt(nextStat.getValue())))).append("\n");
-            } else {
-                sb.append(nextStat.getValue()).append("\n");
-            }
-            if (!staterator.hasNext()) {
-                sb.append("\n");
-            }
-        } while (staterator.hasNext());
-        return sb.toString();
     }
 
     private Stat findStatById(String statLabel) {

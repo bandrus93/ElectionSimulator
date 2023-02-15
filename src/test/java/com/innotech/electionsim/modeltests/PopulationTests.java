@@ -11,7 +11,7 @@ public class PopulationTests {
 
     @BeforeTest
     public void setup() {
-        testPop = new Population(populationExpected);
+        testPop = Population.getInstance(populationExpected);
     }
 
     @Test
