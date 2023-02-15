@@ -124,8 +124,8 @@ public class DisplayManager {
             String popularVotes = next.getTotalVotes().toString();
             double percentage = (next.getTotalVotes() / Double.parseDouble(result.getTotalPopulation().toString())) * 100;
             StringBuilder meterBuilder = new StringBuilder();
-            Double tallyCount = percentage / 5;
-            int percentCounter = tallyCount.intValue();
+            double tallyCount = percentage / 5;
+            int percentCounter = (int) tallyCount;
             for (; percentCounter > 0; percentCounter--) {
                 meterBuilder.append("*");
             }

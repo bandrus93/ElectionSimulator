@@ -1,5 +1,6 @@
 package com.innotech.electionsim.model;
 
+import com.innotech.electionsim.controller.UserInterface;
 import com.innotech.electionsim.view.DisplayManager;
 
 import java.util.*;
@@ -58,11 +59,10 @@ public class Candidate {
         return false;
     }
 
-    public void edit(Scanner uiController) {
-        System.out.println(printCandidateStats() + DisplayManager.CANDIDATE_EDIT_PROMPT);
+    public void edit() {
         boolean editing = true;
         do {
-            String input = uiController.nextLine();
+            String input = UserInterface.getStringInput(printCandidateStats() + DisplayManager.CANDIDATE_EDIT_PROMPT);
             String[] edit = input.split(" ");
             switch (edit[0].toUpperCase()) {
                 case "N":

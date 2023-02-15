@@ -1,6 +1,7 @@
 package com.innotech.electionsim.data;
 
 import com.google.gson.Gson;
+import com.innotech.electionsim.controller.UserInterface;
 import com.innotech.electionsim.view.DisplayManager;
 
 import java.io.FileWriter;
@@ -104,34 +105,24 @@ public class ElectionSettings {
         return locator >= 0 && locator < arr.length ? arr[locator].toString() : "PLURALITY";
     }
 
-    public void update(Scanner uiController) {
-        System.out.println(DisplayManager.getCurrentSettingsMenu() + DisplayManager.SETTINGS_PROMPT);
+    public void update() {
         boolean updating = true;
         do {
-            switch (uiController.nextLine()) {
-                case "1" -> {
-                    System.out.println(DisplayManager.LOCALE_PROMPT);
-                    setLocale(uiController.nextLine());
-                }
-                case "2" -> {
-                    System.out.println(getRaceMenu() + DisplayManager.RACE_PROMPT);
-                    setRace(findRaceTypeByValue(uiController.nextLine()));
-                }
-                case "3" -> {
-                    System.out.println(getElectionMenu() + DisplayManager.ELECTION_PROMPT);
-                    setType(findElectionTypeByValue(uiController.nextLine()));
-                }
-                case "4" -> {
-                    System.out.println(DisplayManager.DATE_PROMPT);
-                    setElectionDay(uiController.nextLine());
-                }
+            switch (UserInterface.getStringInput(DisplayManager.getCurrentSettingsMenu() + DisplayManager.SETTINGS_PROMPT)) {
+                case "1" ->
+                    setLocale(UserInterface.getStringInput(DisplayManager.LOCALE_PROMPT));
+                case "2" ->
+                    setRace(findRaceTypeByValue(UserInterface.getStringInput(getRaceMenu() + DisplayManager.RACE_PROMPT)));
+                case "3" ->
+                    setType(findElectionTypeByValue(UserInterface.getStringInput(getElectionMenu() + DisplayManager.ELECTION_PROMPT)));
+                case "4" ->
+                    setElectionDay(UserInterface.getStringInput(DisplayManager.DATE_PROMPT));
                 case "s" -> {
                     save();
                     updating = false;
                 }
-                default -> {
+                default ->
                     System.out.println(DisplayManager.INVALID_COMMAND);
-                }
             }
             if (updating) {
                 System.out.println(DisplayManager.getCurrentSettingsMenu() + DisplayManager.SETTINGS_PROMPT);

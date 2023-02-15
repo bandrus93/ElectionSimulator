@@ -1,5 +1,6 @@
 package com.innotech.electionsim.model;
 
+import com.innotech.electionsim.controller.UserInterface;
 import com.innotech.electionsim.view.DisplayManager;
 
 import java.util.*;
@@ -72,11 +73,9 @@ public class Population {
         return sb.toString();
     }
 
-    public void edit(Scanner inputReader) {
-        System.out.println(printGraph() + DisplayManager.POPULATION_COMMAND_LIST);
+    public void edit() {
         do {
-            String input = inputReader.nextLine();
-            switch (input) {
+            switch (UserInterface.getStringInput(printGraph() + DisplayManager.POPULATION_COMMAND_LIST)) {
                 case "l": shift("LEFT", 0.013); break;
                 case "r": shift("RIGHT", 0.013); break;
                 case "L": shift("LEFT", 0.05); break;

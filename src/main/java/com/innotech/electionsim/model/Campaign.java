@@ -8,15 +8,12 @@ import com.innotech.electionsim.view.DisplayManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
-import java.util.Scanner;
 
 public class Campaign {
     private Population population;
     private final List<Candidate> candidates;
-    private final Scanner uiController;
 
-    public Campaign(Scanner uiController) {
-        this.uiController = uiController;
+    public Campaign() {
         this.candidates = new ArrayList<>();
     }
 
@@ -26,7 +23,7 @@ public class Campaign {
 
     public void setPopulation(long totalVoters) {
         this.population = Population.getInstance(totalVoters);
-        population.edit(uiController);
+        population.edit();
     }
 
     public List<Candidate> getCandidates() {
@@ -34,9 +31,8 @@ public class Campaign {
     }
 
     public void addCandidate() {
-        DisplayManager.refresh(DisplayManager.CANDIDATE_NAME_PROMPT);
         candidates.add(new Candidate.Builder()
-                .name(uiController.nextLine())
+                .name(UserInterface.getStringInput(DisplayManager.CANDIDATE_NAME_PROMPT))
                 .platform((Population.Segment) UserInterface.getMenuSelection(DisplayManager.CANDIDATE_ALIGNMENT_PROMPT, Population.getSegmentArray()))
                 .energyLevel(UserInterface.getNumericInput(DisplayManager.CANDIDATE_ENERGY_PROMPT))
                 .intelligence(UserInterface.getNumericInput(DisplayManager.CANDIDATE_INTELLIGENCE_PROMPT))
