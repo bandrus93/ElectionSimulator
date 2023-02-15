@@ -1,6 +1,5 @@
 package com.innotech.electionsim.controller;
 
-import com.innotech.electionsim.model.Population;
 import com.innotech.electionsim.view.DisplayManager;
 
 import java.util.Scanner;
@@ -23,11 +22,11 @@ public class UserInterface {
         } while (true);
     }
 
-    public static Population.Segment getAlignment(String prompt, Population.Segment[] options) {
+    public static Object getMenuSelection(String prompt, Object[] options) {
         System.out.println(prompt + "\n");
         for (int i = 0; i < options.length; i++) {
-            Population.Segment segment = options[i];
-            System.out.println((i + 1) + " - " + segment + "\n");
+            Object option = options[i];
+            System.out.println((i + 1) + " - " + option + "\n");
         }
         do {
             String input = inputReader.nextLine();

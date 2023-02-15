@@ -37,7 +37,7 @@ public class Campaign {
         DisplayManager.refresh(DisplayManager.CANDIDATE_NAME_PROMPT);
         candidates.add(new Candidate.Builder()
                 .name(uiController.nextLine())
-                .platform(UserInterface.getAlignment(DisplayManager.CANDIDATE_ALIGNMENT_PROMPT, Population.getSegmentArray()))
+                .platform((Population.Segment) UserInterface.getMenuSelection(DisplayManager.CANDIDATE_ALIGNMENT_PROMPT, Population.getSegmentArray()))
                 .energyLevel(UserInterface.getNumericInput(DisplayManager.CANDIDATE_ENERGY_PROMPT))
                 .intelligence(UserInterface.getNumericInput(DisplayManager.CANDIDATE_INTELLIGENCE_PROMPT))
                 .wit(UserInterface.getNumericInput(DisplayManager.CANDIDATE_WIT_PROMPT))
