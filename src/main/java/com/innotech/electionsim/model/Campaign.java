@@ -47,17 +47,6 @@ public class Campaign {
         );
     }
 
-    public String printCandidateList() {
-        StringBuilder sb = new StringBuilder(DisplayManager.CANDIDATE_LIST_HEADING);
-        for (int i = 0; i < candidates.size(); i++) {
-            sb.append(i + 1).append(" - ").append(candidates.get(i).getName()).append("\n");
-            if (i == candidates.size() - 1) {
-                sb.append("\n");
-            }
-        }
-        return sb.toString();
-    }
-
     public ElectionResult runElection(String electionType) {
         PriorityQueue<Candidate> resultRank = new PriorityQueue<>(new ElectionComparator());
         for (PopulationSegment segment : population.getSegments()) {

@@ -1,6 +1,7 @@
 package com.innotech.electionsim.view;
 
 import com.innotech.electionsim.data.ElectionSettings;
+import com.innotech.electionsim.model.Campaign;
 import com.innotech.electionsim.model.Candidate;
 import com.innotech.electionsim.model.ElectionResult;
 
@@ -78,6 +79,18 @@ public class DisplayManager {
         System.out.println("\033[H\033[2J");
         System.out.flush();
         System.out.println(reprint);
+    }
+
+    public static String printCandidateList(Campaign campaign) {
+        StringBuilder sb = new StringBuilder(DisplayManager.CANDIDATE_LIST_HEADING);
+        List<Candidate> candidates = campaign.getCandidates();
+        for (int i = 0; i < candidates.size(); i++) {
+            sb.append(i + 1).append(" - ").append(candidates.get(i).getName()).append("\n");
+            if (i == candidates.size() - 1) {
+                sb.append("\n");
+            }
+        }
+        return sb.toString();
     }
 
     public static void printSavedResults(List<ElectionResult> resultList) {

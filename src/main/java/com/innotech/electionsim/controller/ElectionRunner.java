@@ -33,9 +33,7 @@ public class ElectionRunner {
         do {
             String input = uiController.nextLine();
             switch (input) {
-                case "1" -> {
-                    newElection();
-                }
+                case "1" -> newElection();
                 case "2" -> {
                     try {
                         List<ElectionResult> saved = electionRepo.load();
@@ -54,12 +52,8 @@ public class ElectionRunner {
                         System.out.println("Failed to load save data.");
                     }
                 }
-                case "3" -> {
-                    settings.update(uiController);
-                }
-                case "q" -> {
-                    isActiveSession = false;
-                }
+                case "3" -> settings.update(uiController);
+                case "q" -> isActiveSession = false;
                 default -> System.out.println("Invalid selection");
             }
             String message = isActiveSession ? DisplayManager.getGreetingMessage() + DisplayManager.MAIN_MENU : "See you soon!";
@@ -71,7 +65,7 @@ public class ElectionRunner {
         Campaign campaign = new Campaign(uiController);
         campaign.setPopulation(UserInterface.getNumericInput(DisplayManager.POPULATION_PROMPT));
         campaign.addCandidate();
-        DisplayManager.refresh(campaign.printCandidateList() + DisplayManager.CAMPAIGN_COMMAND_LIST);
+        DisplayManager.refresh(DisplayManager.printCandidateList(campaign) + DisplayManager.CAMPAIGN_COMMAND_LIST);
         do {
             String input = uiController.nextLine();
             String[] command = input.split(" ");
@@ -90,9 +84,7 @@ public class ElectionRunner {
                 }
             } else {
                 switch (input) {
-                    case "+" -> {
-                        campaign.addCandidate();
-                    }
+                    case "+" -> campaign.addCandidate();
                     case "r" -> {
                         ElectionResult result;
                         String electionType = settings.getType();
@@ -136,7 +128,7 @@ public class ElectionRunner {
                     default -> System.out.println(DisplayManager.INVALID_COMMAND);
                 }
             }
-            DisplayManager.refresh(campaign.printCandidateList() + DisplayManager.CAMPAIGN_COMMAND_LIST);
+            DisplayManager.refresh(DisplayManager.printCandidateList(campaign) + DisplayManager.CAMPAIGN_COMMAND_LIST);
         } while (true);
     }
 }
