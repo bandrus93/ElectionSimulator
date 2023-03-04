@@ -1,7 +1,6 @@
 package com.innotech.electionsim.model;
 
-import com.innotech.electionsim.controller.UserInterface;
-import com.innotech.electionsim.view.DisplayManager;
+import com.innotech.electionsim.view.CandidateView;
 
 import java.util.*;
 
@@ -19,7 +18,7 @@ public class Candidate {
     }
 
     public String getName() {
-        Stat name = findStatById(DisplayManager.CANDIDTAE_NAME_LABEL);
+        Stat name = findStatById(CandidateView.CANDIDTAE_NAME_LABEL);
         return name.getValue() != null ? name.getValue() : "Candidate not found";
     }
 
@@ -39,10 +38,14 @@ public class Candidate {
         return swayScore;
     }
 
+    public void setSwayScore(int swayScore) {
+        this.swayScore = swayScore;
+    }
+
     public int getPositionIndex() {
         Population.Segment[] segments = Population.getSegmentArray();
         for (int i = 0; i < segments.length; i++) {
-            if (findStatById(DisplayManager.CANDIDATE_ALIGNMENT_LABEL).getValue().equals(segments[i].toString())) {
+            if (findStatById(CandidateView.CANDIDATE_ALIGNMENT_LABEL).getValue().equals(segments[i].toString())) {
                 return i;
             }
         }
@@ -63,44 +66,11 @@ public class Candidate {
         return false;
     }
 
-    public void edit() {
-        boolean editing = true;
-        do {
-            String input = UserInterface.getStringInput(DisplayManager.printCandidateStats(this) + DisplayManager.CANDIDATE_EDIT_PROMPT);
-            String[] edit = input.split(" ");
-            switch (edit[0].toUpperCase()) {
-                case "N":
-                    findStatById(DisplayManager.CANDIDTAE_NAME_LABEL).setValue(edit[1]);
-                    break;
-                case "A":
-                    findStatById(DisplayManager.CANDIDATE_ALIGNMENT_LABEL).setValue(edit[1]);
-                    break;
-                case "E":
-                    findStatById(DisplayManager.CANDIDATE_ENERGY_LABEL).setValue(edit[1]);
-                    break;
-                case "I":
-                    findStatById(DisplayManager.CANDIDATE_INTELLIGENCE_LABEL).setValue(edit[1]);
-                    break;
-                case "W":
-                    findStatById(DisplayManager.CANDIDATE_WIT_LABEL).setValue(edit[1]);
-                    break;
-                case "L":
-                    findStatById(DisplayManager.CANDIDATE_LEVEL_HEAD_LABEL).setValue(edit[1]);
-                    break;
-                case "S":
-                    findStatById(DisplayManager.CANDIDATE_SPEAK_ABILITY_LABEL).setValue(edit[1]);
-                    break;
-                case "F":
-                    editing = false;
-                default:
-                    System.out.println("Invalid edit command");
-            }
-            swayScore = computeSwayScore();
-            DisplayManager.refresh(DisplayManager.printCandidateStats(this) + DisplayManager.CANDIDATE_EDIT_PROMPT);
-        } while (editing);
+    public boolean hasMajority(Long totalPopulation) {
+        return votesReceived / Double.parseDouble(totalPopulation.toString()) > 0.5;
     }
 
-    private Stat findStatById(String statLabel) {
+    public Stat findStatById(String statLabel) {
         for (Stat stat : stats) {
             if (stat.getLabel().equals(statLabel)) {
                 return stat;
@@ -108,7 +78,7 @@ public class Candidate {
         }
         return null;
     }
-    private int computeSwayScore() {
+    public int computeSwayScore() {
         int scoreTotal = 0;
         for (Stat stat : stats) {
             if (stat.isNumeral()) {
@@ -122,37 +92,37 @@ public class Candidate {
         private final Candidate candidate = new Candidate();
 
         public Builder name(String name) {
-            candidate.stats.add(new Stat(DisplayManager.CANDIDTAE_NAME_LABEL, name, false));
+            candidate.stats.add(new Stat(CandidateView.CANDIDTAE_NAME_LABEL, name, false));
             return this;
         }
 
         public Builder platform(Population.Segment partyAlignment) {
-            candidate.stats.add(new Stat(DisplayManager.CANDIDATE_ALIGNMENT_LABEL, partyAlignment.toString(), false));
+            candidate.stats.add(new Stat(CandidateView.CANDIDATE_ALIGNMENT_LABEL, partyAlignment.toString(), false));
             return this;
         }
 
         public Builder energyLevel(Integer energy) {
-            candidate.stats.add(new Stat(DisplayManager.CANDIDATE_ENERGY_LABEL, energy.toString(), true));
+            candidate.stats.add(new Stat(CandidateView.CANDIDATE_ENERGY_LABEL, energy.toString(), true));
             return this;
         }
 
         public Builder intelligence(Integer intelligence) {
-            candidate.stats.add(new Stat(DisplayManager.CANDIDATE_INTELLIGENCE_LABEL, intelligence.toString(), true));
+            candidate.stats.add(new Stat(CandidateView.CANDIDATE_INTELLIGENCE_LABEL, intelligence.toString(), true));
             return this;
         }
 
         public Builder wit(Integer wit) {
-            candidate.stats.add(new Stat(DisplayManager.CANDIDATE_WIT_LABEL, wit.toString(), true));
+            candidate.stats.add(new Stat(CandidateView.CANDIDATE_WIT_LABEL, wit.toString(), true));
             return this;
         }
 
         public Builder levelHeadedness(Integer levelHeadedness) {
-            candidate.stats.add(new Stat(DisplayManager.CANDIDATE_LEVEL_HEAD_LABEL, levelHeadedness.toString(), true));
+            candidate.stats.add(new Stat(CandidateView.CANDIDATE_LEVEL_HEAD_LABEL, levelHeadedness.toString(), true));
             return this;
         }
 
         public Builder speakingAbility(Integer speakAbility) {
-            candidate.stats.add(new Stat(DisplayManager.CANDIDATE_SPEAK_ABILITY_LABEL, speakAbility.toString(), true));
+            candidate.stats.add(new Stat(CandidateView.CANDIDATE_SPEAK_ABILITY_LABEL, speakAbility.toString(), true));
             return this;
         }
 

@@ -1,1 +1,1 @@
-{"locale":"Berlundy","race":"PRESIDENTIAL","type":"APPROVAL","electionDay":"NULL"}
+{"locale":"Colorado","race":"PRESIDENTIAL","type":"INSTANT_RUNOFF","electionDay":"NULL"}

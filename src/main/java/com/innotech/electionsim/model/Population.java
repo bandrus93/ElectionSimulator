@@ -1,8 +1,5 @@
 package com.innotech.electionsim.model;
 
-import com.innotech.electionsim.controller.UserInterface;
-import com.innotech.electionsim.view.DisplayManager;
-
 import java.util.*;
 
 public class Population {
@@ -58,27 +55,6 @@ public class Population {
 
     public LinkedList<PopulationSegment> getSegments() {
         return segments;
-    }
-
-    public void edit() {
-        do {
-            switch (UserInterface.getStringInput(DisplayManager.printPopulationGraph(this) + DisplayManager.POPULATION_COMMAND_LIST)) {
-                case "l": shift("LEFT", 0.013); break;
-                case "r": shift("RIGHT", 0.013); break;
-                case "L": shift("LEFT", 0.05); break;
-                case "R": shift("RIGHT", 0.05); break;
-                case "p+": polarize("OUT", 0.013); break;
-                case "p-": polarize("IN", 0.013); break;
-                case "P+": polarize("OUT", 0.05); break;
-                case "P-": polarize("IN", 0.05); break;
-                case "d": divide(1); break;
-                case "D": divide(2); break;
-                case "f": return;
-                default:
-                    System.out.println("Invalid command");
-            }
-            DisplayManager.refresh(DisplayManager.printPopulationGraph(this) + DisplayManager.POPULATION_COMMAND_LIST);
-        } while (true);
     }
 
     private PopulationSegment getOvertonCenter() {

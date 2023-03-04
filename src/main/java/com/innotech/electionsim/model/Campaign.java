@@ -1,62 +1,58 @@
 package com.innotech.electionsim.model;
 
-import com.innotech.electionsim.controller.ApprovalComparator;
-import com.innotech.electionsim.controller.ElectionComparator;
-import com.innotech.electionsim.controller.UserInterface;
+import com.innotech.electionsim.controller.*;
 import com.innotech.electionsim.view.DisplayManager;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
 
 public class Campaign {
-    private Population population;
-    private final List<Candidate> candidates;
+    private final PopulationController populationController;
+    private final CandidateController candidateController;
+    private final ElectionSettings context;
 
-    public Campaign() {
-        this.candidates = new ArrayList<>();
-    }
-
-    public Population getPopulation() {
-        return population;
-    }
-
-    public void setPopulation(long totalVoters) {
-        this.population = Population.getInstance(totalVoters);
-        population.edit();
+    public Campaign(PopulationController populationController, CandidateController candidateController, ElectionSettings context) {
+        this.populationController = populationController;
+        this.candidateController = candidateController;
+        this.context = context;
     }
 
     public List<Candidate> getCandidates() {
-        return candidates;
+        return candidateController.getCandidates();
     }
 
-    public void addCandidate() {
-        candidates.add(new Candidate.Builder()
-                .name(UserInterface.getStringInput(DisplayManager.CANDIDATE_NAME_PROMPT))
-                .platform((Population.Segment) UserInterface.getMenuSelection(DisplayManager.CANDIDATE_ALIGNMENT_PROMPT, Population.getSegmentArray()))
-                .energyLevel(UserInterface.getNumericInput(DisplayManager.CANDIDATE_ENERGY_PROMPT))
-                .intelligence(UserInterface.getNumericInput(DisplayManager.CANDIDATE_INTELLIGENCE_PROMPT))
-                .wit(UserInterface.getNumericInput(DisplayManager.CANDIDATE_WIT_PROMPT))
-                .levelHeadedness(UserInterface.getNumericInput(DisplayManager.CANDIDATE_LEVEL_HEAD_PROMPT))
-                .speakingAbility(UserInterface.getNumericInput(DisplayManager.CANDIDATE_SPEAK_ABILITY_PROMPT))
-                .register()
-        );
-    }
+    public PopulationController getPopulationController() { return populationController; }
 
-    public ElectionResult runElection(String electionType) {
-        PriorityQueue<Candidate> resultRank = new PriorityQueue<>(new ElectionComparator());
-        for (PopulationSegment segment : population.getSegments()) {
-            PriorityQueue<Candidate> eligibles = getApprovedCandidateRanking(segment);
-            segment.castBallots(eligibles, electionType);
+    public void edit(String command) {
+        int selection = command.length() == 2 ? Integer.parseInt(String.valueOf(command.charAt(1))) - 1 : 0;
+        switch (command.charAt(0)) {
+            case '+' -> candidateController.addCandidate();
+            case '-' -> DisplayManager.refresh(candidateController.remove(selection).getName() + " has dropped out of the race.");
+            case 'e' -> candidateController.edit(selection);
+            default -> DisplayManager.refresh(UserInterface.INVALID_COMMAND);
         }
-        resultRank.addAll(candidates);
-        return new ElectionResult(resultRank, population.getTotalPopulation());
+    }
+
+    public ElectionResult cycle() {
+        PriorityQueue<Candidate> resultRank = new PriorityQueue<>(new ElectionComparator());
+        for (PopulationSegment segment : populationController.getPopulation().getSegments()) {
+            PriorityQueue<Candidate> eligibles = getApprovedCandidateRanking(segment);
+            segment.castBallots(eligibles, context.getType());
+        }
+        resultRank.addAll(candidateController.getCandidates());
+        return new ElectionResult(resultRank, populationController.getPopulation().getTotalPopulation(), context);
+    }
+
+    public void resetCandidateVotes() {
+        for (Candidate candidate : candidateController.getCandidates()) {
+            candidate.resetVotes();
+        }
     }
 
     private PriorityQueue<Candidate> getApprovedCandidateRanking(PopulationSegment segment) {
-        int segmentPosition = population.getSegments().indexOf(segment);
+        int segmentPosition = populationController.getPopulation().getSegments().indexOf(segment);
         PriorityQueue<Candidate> eligibles = new PriorityQueue<>(new ApprovalComparator());
-        for (Candidate candidate : candidates) {
+        for (Candidate candidate : candidateController.getCandidates()) {
             int candidatePosition = candidate.getPositionIndex();
             if (candidate.isApproved(segmentPosition, candidatePosition, segment.getMaxDiff())) {
                 eligibles.add(candidate);
