@@ -67,7 +67,7 @@ public class Candidate {
     }
 
     public boolean hasMajority(Long totalPopulation) {
-        return votesReceived / Double.parseDouble(totalPopulation.toString()) > 0.5;
+        return !(votesReceived / Double.parseDouble(totalPopulation.toString()) > 0.5);
     }
 
     public Stat findStatById(String statLabel) {

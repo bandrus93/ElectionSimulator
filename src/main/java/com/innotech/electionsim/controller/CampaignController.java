@@ -43,12 +43,12 @@ public class CampaignController {
                     List<Candidate> eliminated = new ArrayList<>();
                     do {
                         result = campaign.cycle();
-                        if (!result.getWinner().hasMajority(result.getTotalPopulation())) {
+                        if (result.getWinner().hasMajority(result.getTotalPopulation())) {
                             campaign.getCandidates().remove(result.getLoser());
                             eliminated.add(result.getLoser());
                             campaign.resetCandidateVotes();
                         }
-                    } while (!result.getWinner().hasMajority(result.getTotalPopulation()));
+                    } while (result.getWinner().hasMajority(result.getTotalPopulation()));
                     return result.append(eliminated);
                 }
             } else {
