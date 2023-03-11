@@ -3,11 +3,21 @@ package com.innotech.electionsim.model;
 public class PopulationSegment {
     private final Population.Segment voterBlock;
     private int maxDiff = 3;
+    private double overtonCoefficient;
+
     private long blockBase;
 
-    public PopulationSegment(Population.Segment blockGroup, long voterBase) {
-        this.voterBlock = blockGroup;
-        this.blockBase = voterBase;
+    public PopulationSegment(Population.Segment blockGroup, long totalPopulation) {
+        voterBlock = blockGroup;
+        switch (voterBlock.ordinal()) {
+            case 8, 0 -> overtonCoefficient = 1;
+            case 7, 1 -> overtonCoefficient = 8;
+            case 6, 2 -> overtonCoefficient = 28;
+            case 5, 3 -> overtonCoefficient = 56;
+            case 4 -> overtonCoefficient = 70;
+            default -> throw new RuntimeException();
+        }
+        blockBase = computeBlockBase(totalPopulation);
         setMaxDiff();
     }
 
@@ -30,9 +40,13 @@ public class PopulationSegment {
     public void castBallots(Iterable<Candidate> eligibles, ElectionSettings.ElectionType electionType) {
         for (Candidate toRank : eligibles) {
             int totalSway = ElectionSettings.ElectionType.APPROVAL.equals(electionType) ? toRank.getSwayScore() : computeTotalSway(eligibles);
-            long votesGained = Math.round(this.blockBase * (toRank.getSwayScore() / Double.parseDouble(Integer.toString(totalSway))));
+            long votesGained = Math.round(blockBase * (toRank.getSwayScore() / Double.parseDouble(Integer.toString(totalSway))));
             toRank.incrementVotes(votesGained);
         }
+    }
+
+    private long computeBlockBase(long totalPopulation) {
+        return Math.round((overtonCoefficient / 256.0) * totalPopulation);
     }
 
     private int computeTotalSway(Iterable<Candidate> eligibles) {
@@ -49,5 +63,13 @@ public class PopulationSegment {
         || this.voterBlock.equals(Population.Segment.MODERATE_RIGHT)) {
             maxDiff = 4;
         }
+    }
+
+    public double getOvertonCoefficient() {
+        return overtonCoefficient;
+    }
+
+    public void setOvertonCoefficient(double coefficient) {
+        overtonCoefficient = coefficient;
     }
 }

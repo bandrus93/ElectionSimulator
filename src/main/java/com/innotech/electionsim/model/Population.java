@@ -24,15 +24,15 @@ public class Population {
 
     public static Population getInstance(long registeredVoters) {
         Population population = new Population(registeredVoters);
-        population.segments.add(new PopulationSegment(Segment.RADICAL_LEFT, Math.round(registeredVoters * 0.025)));
-        population.segments.add(new PopulationSegment(Segment.FAR_LEFT, Math.round(registeredVoters * 0.05)));
-        population.segments.add(new PopulationSegment(Segment.MODERATE_LEFT, Math.round(registeredVoters * 0.091)));
-        population.segments.add(new PopulationSegment(Segment.CENTRE_LEFT, Math.round(registeredVoters * 0.167)));
-        population.segments.add(new PopulationSegment(Segment.CENTRIST, Math.round(registeredVoters * .334)));
-        population.segments.add(new PopulationSegment(Segment.CENTRE_RIGHT, Math.round(registeredVoters * .167)));
-        population.segments.add(new PopulationSegment(Segment.MODERATE_RIGHT, Math.round(registeredVoters * 0.091)));
-        population.segments.add(new PopulationSegment(Segment.FAR_RIGHT, Math.round(registeredVoters * 0.05)));
-        population.segments.add(new PopulationSegment(Segment.RADICAL_RIGHT, Math.round(registeredVoters * 0.025)));
+        population.segments.add(new PopulationSegment(Segment.RADICAL_LEFT, registeredVoters));
+        population.segments.add(new PopulationSegment(Segment.FAR_LEFT, registeredVoters));
+        population.segments.add(new PopulationSegment(Segment.MODERATE_LEFT, registeredVoters));
+        population.segments.add(new PopulationSegment(Segment.CENTRE_LEFT, registeredVoters));
+        population.segments.add(new PopulationSegment(Segment.CENTRIST, registeredVoters));
+        population.segments.add(new PopulationSegment(Segment.CENTRE_RIGHT, registeredVoters));
+        population.segments.add(new PopulationSegment(Segment.MODERATE_RIGHT, registeredVoters));
+        population.segments.add(new PopulationSegment(Segment.FAR_RIGHT, registeredVoters));
+        population.segments.add(new PopulationSegment(Segment.RADICAL_RIGHT, registeredVoters));
         return population;
     }
 
@@ -109,42 +109,54 @@ public class Population {
         return rightTotal;
     }
 
-    public void shift(String direction, double adjustor) {
-        Long registeredVoters = getTotalPopulation();
-        long affectedVoters = Math.round(registeredVoters * adjustor);
-        double maxLeftBound = getSegment(Segment.RADICAL_LEFT).getBlockBase() / Double.parseDouble(registeredVoters.toString());
-        double maxRightBound = getSegment(Segment.RADICAL_RIGHT).getBlockBase() / Double.parseDouble(registeredVoters.toString());
-        if (maxLeftBound < 0.334 && maxRightBound < 0.334) {
-            long voterOverflow = 0L;
-            for (PopulationSegment currentSegment : segments) {
-                String[] segmentData = currentSegment.getVoterBlock().toString().split("_");
-                if (segmentData.length > 1) {
-                    if (!segmentData[1].equals(direction)) {
-                        long adjustedBase = currentSegment.getBlockBase() - affectedVoters;
-                        if (adjustedBase > 0) {
-                            currentSegment.setBlockBase(adjustedBase);
-                        } else {
-                            voterOverflow += Math.abs(adjustedBase);
-                            currentSegment.setBlockBase(0);
-                        }
-                    } else {
-                        currentSegment.setBlockBase(currentSegment.getBlockBase() + affectedVoters);
-                    }
-                } else {
-                    currentSegment.setBlockBase(currentSegment.getBlockBase() - (affectedVoters + voterOverflow));
-                }
+    private double getOvertonCoefficientSum() {
+        double sum = 0.0;
+        for (PopulationSegment segment : segments) {
+            sum += segment.getOvertonCoefficient();
+        }
+        return sum;
+    }
+
+    public void shiftLeft(double adjustor) {
+        double shifted = 0.0;
+        for (int i = segments.size() - 1; i >= 0; i--) {
+            PopulationSegment segment = segments.get(i);
+            double segmentCoefficient = segment.getOvertonCoefficient();
+            if (i == segments.size() - 1 && segmentCoefficient < 4) {
+                segment.setOvertonCoefficient(0.0);
+                shifted += segmentCoefficient;
+            } else {
+                double preAdjusted = segmentCoefficient + shifted;
+                shifted = 0.0;
+                double toShift = Math.round(preAdjusted / adjustor);
+                segment.setOvertonCoefficient(preAdjusted - toShift);
+                shifted += toShift;
             }
-            int centerIndex = segments.indexOf(getOvertonCenter());
-            if (direction.equals("LEFT") && centerIndex > 1) {
-                PopulationSegment leftOfCenter = segments.get(centerIndex - 1);
-                leftOfCenter.setBlockBase(leftOfCenter.getBlockBase() + affectedVoters);
-            } else if (direction.equals("RIGHT") && centerIndex < segments.size() - 1) {
-                PopulationSegment rightOfCenter = segments.get(centerIndex + 1);
-                rightOfCenter.setBlockBase(rightOfCenter.getBlockBase() + affectedVoters);
+            if (i == 0 && getOvertonCoefficientSum() > 256) {
+                double shiftCorrection = getOvertonCoefficientSum() - 256;
+                segment.setOvertonCoefficient(segment.getOvertonCoefficient() - shiftCorrection);
             }
-            if (getTotalPopulation() < registeredVoters) {
-                long voterUnderflow = registeredVoters - getTotalPopulation();
-                shiftCorrection(voterUnderflow, direction);
+        }
+    }
+
+    public void shiftRight(double adjustor) {
+        double shifted = 0.0;
+        for (int i = 0; i <= segments.size() - 1; i++) {
+            PopulationSegment segment = segments.get(i);
+            double segmentCoefficient = segment.getOvertonCoefficient();
+            if (i == 0 && segmentCoefficient < 4) {
+                segment.setOvertonCoefficient(0.0);
+                shifted += segmentCoefficient;
+            } else {
+                double preAdjusted = segmentCoefficient + shifted;
+                shifted = 0.0;
+                double toShift = Math.round(preAdjusted / adjustor);
+                segment.setOvertonCoefficient(preAdjusted - toShift);
+                shifted += toShift;
+            }
+            if (i == segments.size() - 1 && getOvertonCoefficientSum() > 256) {
+                double shiftCorrection = getOvertonCoefficientSum() - 256;
+                segment.setOvertonCoefficient(segment.getOvertonCoefficient() - shiftCorrection);
             }
         }
     }
@@ -265,17 +277,6 @@ public class Population {
             leftOfCenter.setBlockBase(leftOfCenter.getBlockBase() + lessor);
             rightOfCenter.setBlockBase(rightOfCenter.getBlockBase() + greater);
         }
-    }
-
-    private void shiftCorrection(long voterUnderflow, String shiftDirection) {
-        PopulationSegment centerAt = getOvertonCenter();
-        PopulationSegment pushTo;
-        if (shiftDirection.equals("LEFT")) {
-            pushTo = segments.get(segments.indexOf(centerAt) - 1);
-        } else {
-            pushTo = segments.get(segments.indexOf(centerAt) + 1);
-        }
-        pushTo.setBlockBase(pushTo.getBlockBase() + voterUnderflow);
     }
 
     private void polarCorrection(long voterUnderflow, String direction) {

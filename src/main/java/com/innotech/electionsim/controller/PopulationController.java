@@ -32,10 +32,10 @@ public class PopulationController {
     public void edit() {
         do {
             switch (UserInterface.getStringInput(view.getView() + POPULATION_COMMAND_LIST)) {
-                case "l": population.shift("LEFT", 0.013); break;
-                case "r": population.shift("RIGHT", 0.013); break;
-                case "L": population.shift("LEFT", 0.05); break;
-                case "R": population.shift("RIGHT", 0.05); break;
+                case "l": population.shiftLeft(4); break;
+                case "r": population.shiftRight(4); break;
+                case "L": population.shiftLeft(2); break;
+                case "R": population.shiftRight(2); break;
                 case "p+": population.polarize("OUT", 0.013); break;
                 case "p-": population.polarize("IN", 0.013); break;
                 case "P+": population.polarize("OUT", 0.05); break;
