@@ -2,64 +2,53 @@ package com.innotech.electionsim.modeltests;
 
 import com.innotech.electionsim.model.Population;
 import org.testng.Assert;
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class PopulationTests {
     private Population testPop;
-    private final long populationExpected = 10000L;
+    private final double expectedSum = 256.0;
 
-    @BeforeTest
+    @BeforeMethod
     public void setup() {
+        long populationExpected = 100000L;
         testPop = Population.getInstance(populationExpected);
     }
 
     @Test
-    public void shiftShouldShiftPopulationWithoutAffectingTotalPopulationCountGivenASingleMinorShift() {
-        testPop.shift("LEFT", 0.013);
-        Assert.assertEquals(testPop.getTotalPopulation(), populationExpected);
+    public void givenASingleMinorShift_ShiftLeft_ShouldShiftPopulationWithoutAffectingTotalPopulationCount() {
+        testPop.shiftLeft(4);
+        Assert.assertEquals(testPop.getOvertonCoefficientSum(), expectedSum);
     }
 
     @Test
-    public void shiftShouldShiftPopulationWithoutAffectingTotalPopulationCountGivenASingleMajorShift() {
-        testPop.shift("RIGHT", 0.05);
-        Assert.assertEquals(testPop.getTotalPopulation(), populationExpected);
+    public void givenASingleMajorShift_ShiftRight_ShouldShiftPopulationWithoutAffectingTotalPopulationCount() {
+        testPop.shiftRight(2);
+        Assert.assertEquals(testPop.getOvertonCoefficientSum(), expectedSum);
     }
 
     @Test
-    public void polarizeShouldAdjustPopulationWithoutAffectingTotalPopulationCountGivenASingleMinorPolarizationIn() {
-        testPop.polarize("IN", 0.013);
-        Assert.assertEquals(testPop.getTotalPopulation(), populationExpected);
+    public void givenASingleMinorPolarization_Polarize_ShouldAdjustPopulationWithoutAffectingTotalPopulationCount() {
+        testPop.polarize(4);
+        Assert.assertEquals(testPop.getOvertonCoefficientSum(), expectedSum);
     }
 
     @Test
-    public void polarizeShouldAdjustPopulationWithoutAffectingTotalPopulationCountGivenASingleMajorPolarizationIn() {
-        testPop.polarize("IN", 0.05);
-        Assert.assertEquals(testPop.getTotalPopulation(), populationExpected);
+    public void givenASingleMajorPolarization_Polarize_ShouldAdjustPopulationWithoutAffectingTotalPopulationCount() {
+        testPop.polarize(2);
+        Assert.assertEquals(testPop.getOvertonCoefficientSum(), expectedSum);
     }
 
     @Test
-    public void polarizeShouldAdjustPopulationWithoutAffectingTotalPopulationCountGivenASingleMinorPolarizationOut() {
-        testPop.polarize("OUT", 0.013);
-        Assert.assertEquals(testPop.getTotalPopulation(), populationExpected);
-    }
-
-    @Test
-    public void polarizeShouldAdjustPopulationWithoutAffectingTotalPopulationCountGivenASingleMajorPolarizationOut() {
-        testPop.polarize("OUT", 0.05);
-        Assert.assertEquals(testPop.getTotalPopulation(), populationExpected);
-    }
-
-    @Test
-    public void divideShouldSplitPopulationWithoutAffectingTotalPopulationCountGivenASingleMinorDivide() {
+    public void givenASingleMinorDivide_Divide_ShouldSplitPopulationWithoutAffectingTotalPopulationCount() {
         testPop.divide(1);
-        Assert.assertEquals(testPop.getTotalPopulation(), populationExpected);
+        Assert.assertEquals(testPop.getOvertonCoefficientSum(), expectedSum);
     }
 
     @Test
-    public void divideShouldSplitPopulationWithoutAffectingTotalPopulationCountGivenASingleMajorDivide() {
+    public void givenASingleMajorDivide_Divide_ShouldSplitPopulationWithoutAffectingTotalPopulationCount() {
         testPop.divide(2);
-        Assert.assertEquals(testPop.getTotalPopulation(), populationExpected);
+        Assert.assertEquals(testPop.getOvertonCoefficientSum(), expectedSum);
     }
 
 }

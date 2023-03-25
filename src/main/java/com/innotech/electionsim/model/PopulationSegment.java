@@ -1,23 +1,26 @@
 package com.innotech.electionsim.model;
 
+import com.innotech.electionsim.population.PopulationGraphCalculator;
+
+
 public class PopulationSegment {
     private final Population.Segment voterBlock;
     private int maxDiff = 3;
-    private double overtonCoefficient;
+    private Double overtonCoefficient;
 
     private long blockBase;
 
-    public PopulationSegment(Population.Segment blockGroup, long totalPopulation) {
+    public PopulationSegment(Population.Segment blockGroup, long populationIncrement) {
         voterBlock = blockGroup;
         switch (voterBlock.ordinal()) {
-            case 8, 0 -> overtonCoefficient = 1;
-            case 7, 1 -> overtonCoefficient = 8;
-            case 6, 2 -> overtonCoefficient = 28;
-            case 5, 3 -> overtonCoefficient = 56;
-            case 4 -> overtonCoefficient = 70;
+            case 8, 0 -> overtonCoefficient = 1.0;
+            case 7, 1 -> overtonCoefficient = 8.0;
+            case 6, 2 -> overtonCoefficient = 28.0;
+            case 5, 3 -> overtonCoefficient = 56.0;
+            case 4 -> overtonCoefficient = 70.0;
             default -> throw new RuntimeException();
         }
-        blockBase = computeBlockBase(totalPopulation);
+        blockBase = PopulationGraphCalculator.computeBase(overtonCoefficient, populationIncrement);
         setMaxDiff();
     }
 
@@ -27,10 +30,6 @@ public class PopulationSegment {
 
     public long getBlockBase() {
         return blockBase;
-    }
-
-    public void setBlockBase(long blockBase) {
-        this.blockBase = blockBase;
     }
 
     public int getMaxDiff() {
@@ -45,10 +44,6 @@ public class PopulationSegment {
         }
     }
 
-    private long computeBlockBase(long totalPopulation) {
-        return Math.round((overtonCoefficient / 256.0) * totalPopulation);
-    }
-
     private int computeTotalSway(Iterable<Candidate> eligibles) {
         int totalSway = 0;
         for (Candidate eligible : eligibles) {
@@ -59,8 +54,8 @@ public class PopulationSegment {
 
     private void setMaxDiff() {
         if (this.voterBlock.equals(Population.Segment.CENTRIST)
-        || this.voterBlock.equals(Population.Segment.MODERATE_LEFT)
-        || this.voterBlock.equals(Population.Segment.MODERATE_RIGHT)) {
+                || this.voterBlock.equals(Population.Segment.MODERATE_LEFT)
+                || this.voterBlock.equals(Population.Segment.MODERATE_RIGHT)) {
             maxDiff = 4;
         }
     }
@@ -69,7 +64,8 @@ public class PopulationSegment {
         return overtonCoefficient;
     }
 
-    public void setOvertonCoefficient(double coefficient) {
+    public void setOvertonCoefficient(double coefficient, long populationIncrement) {
         overtonCoefficient = coefficient;
+        blockBase = PopulationGraphCalculator.computeBase(coefficient, populationIncrement);
     }
 }

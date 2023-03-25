@@ -20,7 +20,7 @@ public class PopulationView {
     private static String getGraphRows(Population population) {
         for (PopulationSegment currentSegment : population.getSegments()) {
             viewBuilder.append(formatGraphLabel(currentSegment.getVoterBlock().toString())).append("|");
-            long interval = Math.floorDiv(Math.round((currentSegment.getBlockBase() / Double.parseDouble(population.getTotalPopulation().toString())) * 100), 5);
+            long interval = Math.floorDiv(Math.round((currentSegment.getBlockBase() / Double.parseDouble(population.getTotalPopulation().toString())) * 100), 2);
             for (int j = 0; j < interval; j++) {
                 viewBuilder.append("*");
             }
@@ -43,9 +43,5 @@ public class PopulationView {
 
     public String getView() {
         return view;
-    }
-
-    public void display() {
-        System.out.println(view);
     }
 }
