@@ -16,14 +16,14 @@ public class PopulationTests {
     }
 
     @Test
-    public void givenASingleMinorShift_ShiftLeft_ShouldShiftPopulationWithoutAffectingTotalPopulationCount() {
-        testPop.shiftLeft(4);
+    public void givenASingleMinorShift_Shift_ShouldShiftPopulationWithoutAffectingTotalPopulationCount() {
+        testPop.shift(4, "-");
         Assert.assertEquals(testPop.getOvertonCoefficientSum(), expectedSum);
     }
 
     @Test
-    public void givenASingleMajorShift_ShiftRight_ShouldShiftPopulationWithoutAffectingTotalPopulationCount() {
-        testPop.shiftRight(2);
+    public void givenASingleMajorShift_Shift_ShouldShiftPopulationWithoutAffectingTotalPopulationCount() {
+        testPop.shift(2, "+");
         Assert.assertEquals(testPop.getOvertonCoefficientSum(), expectedSum);
     }
 

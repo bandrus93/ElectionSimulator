@@ -31,10 +31,10 @@ public class PopulationController {
     public void edit() {
         do {
             switch (UserInterface.getStringInput(view.getView() + POPULATION_COMMAND_LIST)) {
-                case "l": population.shiftLeft(4); break;
-                case "r": population.shiftRight(4); break;
-                case "L": population.shiftLeft(2); break;
-                case "R": population.shiftRight(2); break;
+                case "l": population.shift(4, "-"); break;
+                case "r": population.shift(4, "+"); break;
+                case "L": population.shift(2, "-"); break;
+                case "R": population.shift(2, "+"); break;
                 case "p": population.polarize(4); break;
                 case "P": population.polarize(2); break;
                 case "d": population.divide(4); break;

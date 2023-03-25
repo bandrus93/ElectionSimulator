@@ -98,12 +98,13 @@ public class Population {
         }
     }
 
-    public void shiftLeft(double adjustor) {
+    public void shift(double adjustor, String direction) {
+        Iterator<PopulationSegment> shifter = direction.equals("+") ? segments.iterator() : segments.descendingIterator();
         double shifted = 0.0;
-        for (int i = segments.size() - 1; i >= 0; i--) {
-            PopulationSegment segment = segments.get(i);
+        do {
+            PopulationSegment segment = shifter.next();
             double segmentCoefficient = segment.getOvertonCoefficient();
-            if (i == segments.size() - 1 && segmentCoefficient < adjustor) {
+            if (segmentCoefficient < adjustor) {
                 segment.setOvertonCoefficient(0.0, populationIncrement);
                 shifted += segmentCoefficient;
             } else {
@@ -113,31 +114,10 @@ public class Population {
                 segment.setOvertonCoefficient(preAdjusted - toShift, populationIncrement);
                 shifted += toShift;
             }
-            if (i == 0) {
+            if (!shifter.hasNext()) {
                 checkSum(segment);
             }
-        }
-    }
-
-    public void shiftRight(double adjustor) {
-        double shifted = 0.0;
-        for (int i = 0; i <= segments.size() - 1; i++) {
-            PopulationSegment segment = segments.get(i);
-            double segmentCoefficient = segment.getOvertonCoefficient();
-            if (i == 0 && segmentCoefficient < adjustor) {
-                segment.setOvertonCoefficient(0.0, populationIncrement);
-                shifted += segmentCoefficient;
-            } else {
-                double preAdjusted = segmentCoefficient + shifted;
-                shifted = 0.0;
-                double toShift = PopulationGraphCalculator.round(preAdjusted / adjustor);
-                segment.setOvertonCoefficient(preAdjusted - toShift, populationIncrement);
-                shifted += toShift;
-            }
-            if (i == segments.size() - 1) {
-                checkSum(segment);
-            }
-        }
+        } while (shifter.hasNext());
     }
 
     private void pushLeft(double magnitude, PopulationSegment overtonCenter) {
