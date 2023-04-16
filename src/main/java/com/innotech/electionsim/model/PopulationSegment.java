@@ -6,18 +6,18 @@ import com.innotech.electionsim.population.PopulationGraphCalculator;
 public class PopulationSegment {
     private final Population.Segment voterBlock;
     private int maxDiff = 3;
-    private Double overtonCoefficient;
+    private int overtonCoefficient;
 
     private long blockBase;
 
     public PopulationSegment(Population.Segment blockGroup, long populationIncrement) {
         voterBlock = blockGroup;
         switch (voterBlock.ordinal()) {
-            case 8, 0 -> overtonCoefficient = 1.0;
-            case 7, 1 -> overtonCoefficient = 8.0;
-            case 6, 2 -> overtonCoefficient = 28.0;
-            case 5, 3 -> overtonCoefficient = 56.0;
-            case 4 -> overtonCoefficient = 70.0;
+            case 8, 0 -> overtonCoefficient = 1;
+            case 7, 1 -> overtonCoefficient = 8;
+            case 6, 2 -> overtonCoefficient = 28;
+            case 5, 3 -> overtonCoefficient = 56;
+            case 4 -> overtonCoefficient = 70;
             default -> throw new RuntimeException();
         }
         blockBase = PopulationGraphCalculator.computeBase(overtonCoefficient, populationIncrement);
@@ -60,12 +60,28 @@ public class PopulationSegment {
         }
     }
 
-    public double getOvertonCoefficient() {
+    public int getOvertonCoefficient() {
         return overtonCoefficient;
     }
 
-    public void setOvertonCoefficient(double coefficient, long populationIncrement) {
+    public void setOvertonCoefficient(int coefficient, long populationIncrement) {
         overtonCoefficient = coefficient;
         blockBase = PopulationGraphCalculator.computeBase(coefficient, populationIncrement);
+    }
+
+    public void incrementCoefficient() {
+        overtonCoefficient++;
+    }
+
+    public void incrementCoefficient(int amount) {
+        overtonCoefficient += amount;
+    }
+
+    public void decrementCoefficient() {
+        overtonCoefficient--;
+    }
+
+    public void decrementCoefficient(int amount) {
+        overtonCoefficient -= amount;
     }
 }

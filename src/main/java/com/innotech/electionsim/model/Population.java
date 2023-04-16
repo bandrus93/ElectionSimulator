@@ -17,9 +17,15 @@ public class Population {
         RADICAL_LEFT
     }
 
+    public enum Bias {
+        LEFT,
+        RIGHT
+    }
+
     private final LinkedList<PopulationSegment> segments = new LinkedList<>();
     private final long registeredVoters;
     private long populationIncrement;
+    private final Bias bias = Bias.RIGHT;
 
     private Population(long registeredVoters) {
         this.registeredVoters = registeredVoters;
@@ -69,143 +75,187 @@ public class Population {
         return segments;
     }
 
-    private PopulationSegment getOvertonCenter() {
+    public List<PopulationSegment> getOvertonWindow() {
+        List<PopulationSegment> centerPeaks = new ArrayList<>(4);
         PopulationSegment currentCenter = getSegment(Segment.CENTRIST);
         for (PopulationSegment candidate : segments) {
-            if (candidate.getBlockBase() > currentCenter.getBlockBase()) {
+            if (candidate.getOvertonCoefficient() == currentCenter.getOvertonCoefficient()) {
+                centerPeaks.add(candidate);
+            } else if (candidate.getOvertonCoefficient() > currentCenter.getOvertonCoefficient()) {
                 currentCenter = candidate;
+                centerPeaks.clear();
+                centerPeaks.add(candidate);
             }
         }
-        return currentCenter;
+        return centerPeaks;
     }
 
-    public double getOvertonCoefficientSum() {
-        double sum = 0.0;
+    private int getOvertonCenterIndex(List<PopulationSegment> overtonWindow) {
+        int windowSize = overtonWindow.size();
+        PopulationSegment center = overtonWindow.get(0);
+        if (windowSize > 1 && windowSize % 2 == 0) {
+            center = bias.equals(Bias.RIGHT)
+                    ? overtonWindow.get(windowSize / 2)
+                    : overtonWindow.get((windowSize / 2) - 1);
+        } else if (windowSize > 1) {
+            center = overtonWindow.get(1);
+        }
+        return segments.indexOf(center);
+    }
+
+    private List<Integer> getAllWindowIndexes(List<PopulationSegment> overtonWindow) {
+        List<Integer> centerIndexes = new ArrayList<>(overtonWindow.size());
+        for (PopulationSegment segment : overtonWindow) {
+            centerIndexes.add(segments.indexOf(segment));
+        }
+        return centerIndexes;
+    }
+
+    public int getOvertonCoefficientSum() {
+        int sum = 0;
         for (PopulationSegment segment : segments) {
             sum += segment.getOvertonCoefficient();
         }
         return sum;
     }
 
-    private void checkSum(PopulationSegment segment) {
-        if (getOvertonCoefficientSum() > 256) {
-            double shiftCorrection = getOvertonCoefficientSum() - 256;
-            segment.setOvertonCoefficient(segment.getOvertonCoefficient() - shiftCorrection, populationIncrement);
-        } else if (getOvertonCoefficientSum() < 256) {
-            double difference = 256 - getOvertonCoefficientSum();
-            PopulationSegment center = getOvertonCenter();
-            center.setOvertonCoefficient(center.getOvertonCoefficient() + difference, populationIncrement);
+    private boolean checkDistribution(List<Integer> overtonIndexes, int toDistribute) {
+        for (Integer index : overtonIndexes) {
+            if (segments.get(index).getOvertonCoefficient() - toDistribute < 0) return false;
+        }
+        return true;
+    }
+
+    private PopulationSegment getUnifiedCenter() {
+        List<PopulationSegment> overtonWindow = getOvertonWindow();
+        int windowSize = overtonWindow.size();
+        if (windowSize == 1) {
+            return overtonWindow.get(0);
+        } else if (windowSize == 2) {
+            List<Integer> overtonIndexList = getAllWindowIndexes(overtonWindow);
+            int unifiedCenterIndex = overtonIndexList.get(0) + ((overtonIndexList.get(1) - overtonIndexList.get(0)) / 2);
+            return segments.get(unifiedCenterIndex);
+        } else {
+            return segments.get(getOvertonCenterIndex(overtonWindow));
         }
     }
 
-    public void shift(double adjustor, String direction) {
+    private List<Integer> getSplitIndexes(List<Integer> overtonCenterIndexes) {
+        List<Integer> adjustedCenterIndexes = new ArrayList<>();
+        for (Integer index : overtonCenterIndexes) {
+            int leftSplitIndex = index - 2 < 0 ? segments.size() + (index - 2) : index - 2;
+            int rightSplitIndex = index + 2 > segments.size() - 1 ? (index + 2) - segments.size() : index + 2;
+            if (!adjustedCenterIndexes.contains(leftSplitIndex)) adjustedCenterIndexes.add(leftSplitIndex);
+            if (!adjustedCenterIndexes.contains(rightSplitIndex)) adjustedCenterIndexes.add(rightSplitIndex);
+        }
+        return adjustedCenterIndexes;
+    }
+
+    private void proportionalDistribution(int centerIndex, int distribute) {
+        for (PopulationSegment segment : segments) {
+            int indexAt = segments.indexOf(segment);
+            if (indexAt != centerIndex) {
+                segment.incrementCoefficient();
+            } else {
+                segment.incrementCoefficient(distribute - (segments.size() - 1));
+            }
+        }
+    }
+
+    public void shift(int adjustor, String direction) {
         Iterator<PopulationSegment> shifter = direction.equals("+") ? segments.iterator() : segments.descendingIterator();
-        double shifted = 0.0;
+        int distribute = 0;
+        int centerIndex = getOvertonCenterIndex(getOvertonWindow());
         do {
             PopulationSegment segment = shifter.next();
-            double segmentCoefficient = segment.getOvertonCoefficient();
-            if (segmentCoefficient < adjustor) {
-                segment.setOvertonCoefficient(0.0, populationIncrement);
-                shifted += segmentCoefficient;
-            } else {
-                double preAdjusted = segmentCoefficient + shifted;
-                shifted = 0.0;
-                double toShift = PopulationGraphCalculator.round(preAdjusted / adjustor);
-                segment.setOvertonCoefficient(preAdjusted - toShift, populationIncrement);
-                shifted += toShift;
+            int segmentCoefficient = segment.getOvertonCoefficient();
+            if (segmentCoefficient == 0) {
+                continue;
             }
             if (!shifter.hasNext()) {
-                checkSum(segment);
+                segment.incrementCoefficient(distribute);
+            } else {
+                boolean anteCenter = (segments.indexOf(segment) <= centerIndex && direction.equals("+"))
+                        || (segments.indexOf(segment) >= centerIndex && direction.equals("-"));
+                int adjustedCoefficient;
+                if (segmentCoefficient <= adjustor && anteCenter) {
+                    adjustedCoefficient = 0;
+                    distribute += segmentCoefficient;
+                } else if (anteCenter) {
+                    adjustedCoefficient = segmentCoefficient - adjustor;
+                    distribute += adjustor;
+                } else {
+                    adjustedCoefficient = segmentCoefficient + adjustor;
+                    distribute -= adjustor;
+                }
+                segment.setOvertonCoefficient(adjustedCoefficient, populationIncrement);
             }
         } while (shifter.hasNext());
     }
 
-    private void pushLeft(double magnitude, PopulationSegment overtonCenter) {
-        double pushed = 0.0;
-        int boundary = segments.indexOf(overtonCenter);
-        for (int i = segments.size() - 1; i >= boundary; i--) {
-            PopulationSegment segment = segments.get(i);
-            double segmentCoefficient = segment.getOvertonCoefficient();
-            if (i == segments.size() - 1 && segmentCoefficient < magnitude) {
-                segment.setOvertonCoefficient(0.0, populationIncrement);
-                pushed += segmentCoefficient;
-            } else {
-                double preAdjusted = segmentCoefficient + pushed;
-                pushed = 0.0;
-                double toPush = PopulationGraphCalculator.round(preAdjusted / magnitude);
-                segment.setOvertonCoefficient(preAdjusted - toPush, populationIncrement);
-                pushed += toPush;
+    public void polarize(int magnitude) {
+        int windowSize = getOvertonWindow().size();
+        int distribute = (segments.size() - windowSize) * magnitude;
+        int fractionalDistribute = distribute % windowSize == 0
+                ? distribute / windowSize
+                : (distribute - (distribute % windowSize)) / windowSize;
+        int diff = distribute - (fractionalDistribute * windowSize);
+        List<Integer> overtonIndexList = getAllWindowIndexes(getOvertonWindow());
+        int centerCoefficient = getOvertonWindow().get(0).getOvertonCoefficient();
+        if (checkDistribution(overtonIndexList, distribute) && centerCoefficient - distribute >= 32) {
+            for (PopulationSegment segment : segments) {
+                int segmentIndex = segments.indexOf(segment);
+                if (overtonIndexList.contains(segmentIndex)) {
+                    segment.decrementCoefficient(fractionalDistribute);
+                } else if (segment.getOvertonCoefficient() >= 28) {
+                    segment.decrementCoefficient(magnitude);
+                    diff += (magnitude * 2);
+                } else {
+                    segment.incrementCoefficient(magnitude);
+                }
             }
+            segments.get(getOvertonCenterIndex(getOvertonWindow())).incrementCoefficient(diff);
         }
     }
 
-    private void pushRight(double magnitude, PopulationSegment overtonCenter) {
-        double pushed = 0.0;
-        int boundary = segments.indexOf(overtonCenter);
-        for (int i = 0; i <= boundary; i++) {
-            PopulationSegment segment = segments.get(i);
-            double segmentCoefficient = segment.getOvertonCoefficient();
-            if (i == 0 && segmentCoefficient < magnitude) {
-                segment.setOvertonCoefficient(0.0, populationIncrement);
-                pushed += segmentCoefficient;
+    public void unify(int magnitude) {
+        int unifiedCenterIndex = segments.indexOf(getUnifiedCenter());
+        int distribute = (segments.size() - 1) * magnitude;
+        for (PopulationSegment segment : segments) {
+            int segmentCoefficient = segment.getOvertonCoefficient();
+            if (segments.indexOf(segment) == unifiedCenterIndex) {
+                segment.incrementCoefficient(distribute);
             } else {
-                double preAdjusted = segmentCoefficient + pushed;
-                pushed = 0.0;
-                double toPush = PopulationGraphCalculator.round(preAdjusted / magnitude);
-                segment.setOvertonCoefficient(preAdjusted - toPush, populationIncrement);
-                pushed += toPush;
-            }
-        }
-    }
-
-    public void polarize(double magnitude) {
-        PopulationSegment overtonCenter = getOvertonCenter();
-        pushLeft(magnitude, overtonCenter);
-        pushRight(magnitude, overtonCenter);
-        double centerAdjust = 256 - getOvertonCoefficientSum();
-        overtonCenter.setOvertonCoefficient(overtonCenter.getOvertonCoefficient() + centerAdjust, populationIncrement);
-    }
-
-    private void distributeLeft(double distributable, PopulationSegment overtonCenter) {
-        overtonCenter.setOvertonCoefficient(overtonCenter.getOvertonCoefficient() - distributable, populationIncrement);
-        double toDistribute = distributable;
-        int receivers = segments.indexOf(overtonCenter);
-        double receiverDistribution = PopulationGraphCalculator.round(toDistribute / receivers);
-        for (int i = receivers; i >= 0; i--) {
-            PopulationSegment segment = segments.get(i);
-            if (i != 0) {
-                segment.setOvertonCoefficient(segment.getOvertonCoefficient() + receiverDistribution, populationIncrement);
-                toDistribute -= receiverDistribution;
-            } else {
-                segment.setOvertonCoefficient(segment.getOvertonCoefficient() + toDistribute, populationIncrement);
-            }
-        }
-    }
-
-    private void distributeRight(double distributable, PopulationSegment overtonCenter) {
-        overtonCenter.setOvertonCoefficient(overtonCenter.getOvertonCoefficient() - distributable, populationIncrement);
-        double toDistribute = distributable;
-        int receivers = (segments.size() - 1) - segments.indexOf(overtonCenter);
-        double receiverDistribution = PopulationGraphCalculator.round(toDistribute / receivers);
-        for (int i = receivers; i <= segments.size() - 1; i++) {
-            PopulationSegment segment = segments.get(i);
-            if (i != segments.size() - 1) {
-                segment.setOvertonCoefficient(segment.getOvertonCoefficient() + receiverDistribution, populationIncrement);
-                toDistribute -= receiverDistribution;
-            } else {
-                segment.setOvertonCoefficient(segment.getOvertonCoefficient() + toDistribute, populationIncrement);
+                if (segmentCoefficient >= magnitude) {
+                    segment.decrementCoefficient(magnitude);
+                } else {
+                    int difference = Math.abs(segmentCoefficient - magnitude);
+                    segment.setOvertonCoefficient(0, populationIncrement);
+                    PopulationSegment unifiedCenter = segments.get(unifiedCenterIndex);
+                    unifiedCenter.decrementCoefficient(difference);
+                }
             }
         }
     }
 
     public void divide(int divisor) {
-        PopulationSegment overtonCenter = getOvertonCenter();
-        double centerCoefficient = overtonCenter.getOvertonCoefficient();
-        double distributable = centerCoefficient % 2 == 0
-                ? PopulationGraphCalculator.round(centerCoefficient / divisor)
-                : PopulationGraphCalculator.round((centerCoefficient - 1) / divisor);
-        distributeLeft(distributable, overtonCenter);
-        distributeRight(distributable, overtonCenter);
+        List<Integer> currentCenterIndexes = getAllWindowIndexes(getOvertonWindow());
+        List<Integer> adjustedCenterIndexes = getSplitIndexes(currentCenterIndexes);
+        int overtonCoefficient = segments.get(currentCenterIndexes.get(0)).getOvertonCoefficient();
+        int distribute = divisor == 1
+                ? overtonCoefficient - divisor
+                : overtonCoefficient % divisor == 0
+                ? overtonCoefficient / divisor
+                : (overtonCoefficient - (overtonCoefficient % divisor)) / divisor;
+        for (Integer centerAt : currentCenterIndexes) {
+            PopulationSegment currentCenter = segments.get(centerAt);
+            currentCenter.decrementCoefficient(distribute);
+        }
+        int evenSplit = distribute % 2 == 0 ? distribute / 2 : (distribute - 1) / 2;
+        for (Integer index : adjustedCenterIndexes) {
+            proportionalDistribution(index, evenSplit);
+        }
+        if (distribute % 2 != 0) segments.get(getOvertonCenterIndex(getOvertonWindow())).incrementCoefficient();
     }
 
     @Override

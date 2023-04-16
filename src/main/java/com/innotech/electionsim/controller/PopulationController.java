@@ -35,8 +35,8 @@ public class PopulationController {
                 case "r": population.shift(4, "+"); break;
                 case "L": population.shift(2, "-"); break;
                 case "R": population.shift(2, "+"); break;
-                case "p": population.polarize(4); break;
-                case "P": population.polarize(2); break;
+                case "p": population.polarize(2); break;
+                case "P": population.polarize(1); break;
                 case "d": population.divide(4); break;
                 case "D": population.divide(2); break;
                 case "f": return;
