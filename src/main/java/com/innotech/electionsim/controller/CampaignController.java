@@ -4,6 +4,7 @@ import com.innotech.electionsim.model.Campaign;
 import com.innotech.electionsim.model.Candidate;
 import com.innotech.electionsim.model.ElectionResult;
 import com.innotech.electionsim.model.ElectionSettings;
+import com.innotech.electionsim.population.PopulationController;
 import com.innotech.electionsim.view.CampaignView;
 
 import java.util.ArrayList;

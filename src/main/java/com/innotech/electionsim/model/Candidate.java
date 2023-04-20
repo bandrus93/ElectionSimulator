@@ -1,5 +1,6 @@
 package com.innotech.electionsim.model;
 
+import com.innotech.electionsim.population.Population;
 import com.innotech.electionsim.view.CandidateView;
 
 import java.util.*;

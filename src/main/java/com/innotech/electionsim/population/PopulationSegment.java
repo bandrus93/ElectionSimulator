@@ -1,6 +1,7 @@
-package com.innotech.electionsim.model;
+package com.innotech.electionsim.population;
 
-import com.innotech.electionsim.population.PopulationGraphCalculator;
+import com.innotech.electionsim.model.Candidate;
+import com.innotech.electionsim.model.ElectionSettings;
 
 
 public class PopulationSegment {
@@ -20,7 +21,7 @@ public class PopulationSegment {
             case 4 -> overtonCoefficient = 70;
             default -> throw new RuntimeException();
         }
-        blockBase = PopulationGraphCalculator.computeBase(overtonCoefficient, populationIncrement);
+        blockBase = PopulationGraph.computeBase(overtonCoefficient, populationIncrement);
         setMaxDiff();
     }
 
@@ -66,7 +67,7 @@ public class PopulationSegment {
 
     public void setOvertonCoefficient(int coefficient, long populationIncrement) {
         overtonCoefficient = coefficient;
-        blockBase = PopulationGraphCalculator.computeBase(coefficient, populationIncrement);
+        blockBase = PopulationGraph.computeBase(coefficient, populationIncrement);
     }
 
     public void incrementCoefficient() {

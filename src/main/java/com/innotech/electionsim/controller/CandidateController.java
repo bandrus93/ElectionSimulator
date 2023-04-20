@@ -1,7 +1,7 @@
 package com.innotech.electionsim.controller;
 
 import com.innotech.electionsim.model.Candidate;
-import com.innotech.electionsim.model.Population;
+import com.innotech.electionsim.population.Population;
 import com.innotech.electionsim.view.CandidateView;
 
 import java.util.ArrayList;

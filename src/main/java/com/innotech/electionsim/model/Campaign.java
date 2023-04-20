@@ -1,6 +1,8 @@
 package com.innotech.electionsim.model;
 
 import com.innotech.electionsim.controller.*;
+import com.innotech.electionsim.population.PopulationController;
+import com.innotech.electionsim.population.PopulationSegment;
 import com.innotech.electionsim.view.DisplayManager;
 
 import java.util.List;

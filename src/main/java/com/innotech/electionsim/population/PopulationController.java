@@ -1,8 +1,7 @@
-package com.innotech.electionsim.controller;
+package com.innotech.electionsim.population;
 
-import com.innotech.electionsim.model.Population;
+import com.innotech.electionsim.controller.UserInterface;
 import com.innotech.electionsim.view.DisplayManager;
-import com.innotech.electionsim.view.PopulationView;
 
 public class PopulationController {
     private final Population population;
@@ -12,6 +11,7 @@ public class PopulationController {
             To slightly shift alignment left or right, enter 'l' or 'r', respectively;
             To majorly shift alignment left or right, enter 'L' or 'R', respectively;
             To slightly polarize the population, enter 'p'; or to majorly polarize the population enter 'P'.
+            To slightly unify the population, enter 'u'; or to majorly unify the population enter 'U'.
             To slightly divide the population, enter 'd'; or to majorly divide the population enter 'D'.
             When finished, enter 'f'.""";
 
@@ -37,6 +37,8 @@ public class PopulationController {
                 case "R": population.shift(2, "+"); break;
                 case "p": population.polarize(2); break;
                 case "P": population.polarize(1); break;
+                case "u": population.unify(4); break;
+                case "U": population.unify(2);
                 case "d": population.divide(4); break;
                 case "D": population.divide(2); break;
                 case "f": return;

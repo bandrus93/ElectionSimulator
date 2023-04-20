@@ -1,7 +1,4 @@
-package com.innotech.electionsim.view;
-
-import com.innotech.electionsim.model.Population;
-import com.innotech.electionsim.model.PopulationSegment;
+package com.innotech.electionsim.population;
 
 import java.util.Locale;
 
