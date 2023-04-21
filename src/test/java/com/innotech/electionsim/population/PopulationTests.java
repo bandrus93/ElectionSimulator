@@ -1,6 +1,5 @@
-package com.innotech.electionsim.modeltests;
+package com.innotech.electionsim.population;
 
-import com.innotech.electionsim.population.Population;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
