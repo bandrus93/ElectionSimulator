@@ -1,4 +1,4 @@
-package com.innotech.electionsim.model;
+package com.innotech.electionsim.candidate;
 
 public class Stat {
     private final String label;

@@ -1,6 +1,6 @@
 package com.innotech.electionsim;
 
-import com.innotech.electionsim.controller.ElectionRunner;
+import com.innotech.electionsim.election.ElectionRunner;
 import org.springframework.boot.Banner;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.WebApplicationType;

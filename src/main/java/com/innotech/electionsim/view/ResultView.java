@@ -1,25 +1,24 @@
 package com.innotech.electionsim.view;
 
-import com.innotech.electionsim.model.Candidate;
-import com.innotech.electionsim.model.ElectionResult;
-import com.innotech.electionsim.model.ElectionSettings;
+import com.innotech.electionsim.candidate.Candidate;
+import com.innotech.electionsim.election.ElectionResult;
+import com.innotech.electionsim.election.ElectionSettings;
 
 import java.util.Calendar;
 import java.util.List;
 
 public class ResultView {
     private static final StringBuilder viewBuilder = new StringBuilder();
-    private final String view;
 
-    private ResultView(String toDisplay) {
-        view = toDisplay;
+    private ResultView() {
+
     }
 
-    public static ResultView getInstance(ElectionResult result) {
+    public static String getInstance(ElectionResult result) {
         if (!viewBuilder.isEmpty()) {
             viewBuilder.delete(0, viewBuilder.length());
         }
-        return new ResultView(viewBuilder.append(getTableHeader(result.getMetaData())).append(getTableRows(result)).toString());
+        return viewBuilder.append(getTableHeader(result.getMetaData())).append(getTableRows(result)).toString();
     }
 
     private static String getTableHeader(ElectionSettings settings) {
@@ -52,9 +51,5 @@ public class ResultView {
             meterBuilder.append("*");
         }
         return meterBuilder.toString();
-    }
-
-    public void display() {
-        System.out.println(view);
     }
 }

@@ -1,6 +1,8 @@
-package com.innotech.electionsim.model;
+package com.innotech.electionsim.repositories;
 
 import com.google.gson.Gson;
+import com.innotech.electionsim.election.ElectionResult;
+import org.springframework.stereotype.Repository;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -8,23 +10,11 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-
-public class ResultDao {
+@Repository
+public class ResultRepository {
     private final String DATA_PATH = "src/main/resources/result_repository.txt";
     private final Gson gson = new Gson();
     private final List<ElectionResult> savedResults = new ArrayList<>();
-
-    private ResultDao() throws IOException {
-        Scanner dataReader = new Scanner(Paths.get(DATA_PATH)).useDelimiter("\\[\\{\"candidateRanking\"|},\\{\"candidateRanking\"|}}]");
-        do {
-            if (dataReader.hasNext()) {
-                String result = dataReader.next();
-                String reformattedResult = "{\"candidateRanking\"" + result + "}}";
-                ElectionResult savedResult = gson.fromJson(reformattedResult, ElectionResult.class);
-                savedResults.add(savedResult);
-            }
-        } while (dataReader.hasNext());
-    }
 
     public void save(ElectionResult result) {
         try (FileWriter dataWriter = new FileWriter(DATA_PATH)) {
@@ -43,11 +33,16 @@ public class ResultDao {
             System.out.println("Save Error: Unable to save results");
         }
     }
-    public static ResultDao load() throws IOException {
-        return new ResultDao();
-    }
-
-    public List<ElectionResult> getSavedResults() {
+    public List<ElectionResult> load() throws IOException {
+        Scanner dataReader = new Scanner(Paths.get(DATA_PATH)).useDelimiter("\\[\\{\"candidateRanking\"|},\\{\"candidateRanking\"|}}]");
+        do {
+            if (dataReader.hasNext()) {
+                String result = dataReader.next();
+                String reformattedResult = "{\"candidateRanking\"" + result + "}}";
+                ElectionResult savedResult = gson.fromJson(reformattedResult, ElectionResult.class);
+                savedResults.add(savedResult);
+            }
+        } while (dataReader.hasNext());
         return savedResults;
     }
 

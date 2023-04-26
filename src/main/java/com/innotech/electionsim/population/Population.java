@@ -1,8 +1,12 @@
 package com.innotech.electionsim.population;
 
+import com.innotech.electionsim.interfaces.Editable;
+import com.innotech.electionsim.view.UserInterface;
+import com.innotech.electionsim.view.DisplayManager;
+
 import java.util.*;
 
-public class Population {
+public class Population implements Editable {
     public enum Segment {
         RADICAL_RIGHT,
         FAR_RIGHT,
@@ -47,6 +51,28 @@ public class Population {
 
     public LinkedList<PopulationSegment> getSegments() {
         return graph.getSegments();
+    }
+
+    @Override
+    public void edit() {
+        do {
+            switch (UserInterface.getStringInput(graph + UserInterface.POPULATION_EDIT_PROMPT)) {
+                case "l": shift(4, "-"); break;
+                case "r": shift(4, "+"); break;
+                case "L": shift(2, "-"); break;
+                case "R": shift(2, "+"); break;
+                case "p": polarize(2); break;
+                case "P": polarize(1); break;
+                case "u": unify(4); break;
+                case "U": unify(2);
+                case "d": divide(4); break;
+                case "D": divide(2); break;
+                case "f": return;
+                default:
+                    System.out.println("Invalid command");
+            }
+            DisplayManager.refresh(graph + UserInterface.POPULATION_EDIT_PROMPT);
+        } while (true);
     }
 
     public void shift(int adjustor, String direction) {

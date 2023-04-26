@@ -1,1 +1,1 @@
-{"locale":"Colorado","race":"PRESIDENTIAL","type":"INSTANT_RUNOFF","electionDay":"NULL"}
+{"locale":"Conch Republic","race":"PRESIDENTIAL","type":"INSTANT_RUNOFF","electionDay":"NULL"}

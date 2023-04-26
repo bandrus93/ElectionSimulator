@@ -1,6 +1,4 @@
-package com.innotech.electionsim.controller;
-
-import com.innotech.electionsim.model.Candidate;
+package com.innotech.electionsim.candidate;
 
 import java.util.Comparator;
 

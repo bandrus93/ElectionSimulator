@@ -1,7 +1,7 @@
 package com.innotech.electionsim.population;
 
-import com.innotech.electionsim.model.Candidate;
-import com.innotech.electionsim.model.ElectionSettings;
+import com.innotech.electionsim.candidate.Candidate;
+import com.innotech.electionsim.election.ElectionSettings;
 
 
 public class PopulationSegment {

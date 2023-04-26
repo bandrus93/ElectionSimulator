@@ -7,13 +7,16 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 public class PopulationGraph {
     public static final MathContext coefficientContext = new MathContext(8, RoundingMode.DOWN);
     private static final LinkedList<PopulationSegment> segments = new LinkedList<>();
     private static long populationIncrement;
+    private final Long populationTotal;
 
     private PopulationGraph(long registeredVoters) {
+        populationTotal = registeredVoters;
         populationIncrement = new BigDecimal(registeredVoters / 256.0, coefficientContext).longValue();
     }
 
@@ -144,15 +147,28 @@ public class PopulationGraph {
 
     @Override
     public String toString() {
-        StringBuilder statBuilder = new StringBuilder();
-        statBuilder.append("Population increment: ").append(populationIncrement).append("\n");
-        for (PopulationSegment segment : segments) {
-            statBuilder.append(segment.getVoterBlock())
-                    .append(" voters: ")
-                    .append(segment.getOvertonCoefficient() * populationIncrement)
-                    .append("\n");
+        StringBuilder graphBuilder = new StringBuilder();
+        for (PopulationSegment currentSegment : segments) {
+            graphBuilder.append(formatGraphLabel(currentSegment.getVoterBlock().toString())).append("|");
+            long interval = Math.floorDiv(Math.round((currentSegment.getBlockBase() / Double.parseDouble(populationTotal.toString())) * 100), 2);
+            for (int j = 0; j < interval; j++) {
+                graphBuilder.append("*");
+            }
+            graphBuilder.append("\n");
         }
-        return statBuilder.toString();
+        return graphBuilder.toString();
+    }
+
+    private String formatGraphLabel(String fullName) {
+        StringBuilder sb = new StringBuilder();
+        String[] labelData = fullName.split("_");
+        for (String labelDatum : labelData) {
+            sb.append(labelDatum.toUpperCase(Locale.ROOT).charAt(0));
+            if (labelData.length == 1) {
+                sb.append("T");
+            }
+        }
+        return sb.toString();
     }
 
 }
