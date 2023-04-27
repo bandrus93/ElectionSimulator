@@ -48,22 +48,23 @@ public class ElectionRunner {
                 }
                 case "Review Past Elections" -> {
                     boolean viewing = true;
-                    do {
-                        try {
-                            List<ElectionResult> savedResults = data.getSavedResults();
+                    try {
+                        List<ElectionResult> savedResults = data.getSavedResults();
+                        do {
                             if (savedResults.isEmpty()) {
                                 DisplayManager.refresh(UserInterface.EMPTY_SAVE_MESSAGE);
                                 viewing = false;
                             } else {
-                                ElectionResult selected = (ElectionResult) UserInterface.getMenuSelection(UserInterface.RESULT_LIST_PROMPT, savedResults.toArray(), Arrays.asList("f","x"));
+                                ElectionResult selected = (ElectionResult) UserInterface.getMenuSelection(UserInterface.RESULT_LIST_PROMPT, savedResults.toArray(), Arrays.asList("f", "x"));
+                                //if ("x".equals(selected)) viewing = false; <- 'Result List' inescapable from here; this is undesirable behavior but the fix is not currently obvious given this implementation
                                 DisplayManager.refresh(selected.getResultTable());
                                 String escape = UserInterface.getStringInput(UserInterface.EXIT_REVIEW_MODE_PROMPT);
                                 if ("x".equals(escape)) viewing = false;
                             }
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    } while (viewing);
+                        } while (viewing);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
                 case "Settings" -> {
                     settings.edit();
