@@ -37,31 +37,10 @@ public class ElectionRunner {
         boolean isActiveSession = true;
         do {
             switch (UserInterface.getMenuSelection(DisplayManager.getGreetingMessage(settings.getLocale()), DisplayManager.getMainMenuOptions(), List.of("q")).toString()) {
-                case "Start New Election" -> {
-                    Campaign campaign = new Campaign(settings);
-                    campaign.edit();
-                    ElectionResult result = campaign.runElection();
-                    DisplayManager.refresh(result.getResultTable());
-                    if (UserInterface.getStringInput(UserInterface.SAVE_PROMPT).equals("y")) {
-                        data.saveElectionResult(result);
-                    }
-                }
+                case "Start New Election" -> newElection();
                 case "Review Past Elections" -> {
-                    boolean viewing = true;
                     try {
-                        List<ElectionResult> savedResults = data.getSavedResults();
-                        do {
-                            if (savedResults.isEmpty()) {
-                                DisplayManager.refresh(UserInterface.EMPTY_SAVE_MESSAGE);
-                                viewing = false;
-                            } else {
-                                ElectionResult selected = (ElectionResult) UserInterface.getMenuSelection(UserInterface.RESULT_LIST_PROMPT, savedResults.toArray(), Arrays.asList("f", "x"));
-                                //if ("x".equals(selected)) viewing = false; <- 'Result List' inescapable from here; this is undesirable behavior but the fix is not currently obvious given this implementation
-                                DisplayManager.refresh(selected.getResultTable());
-                                String escape = UserInterface.getStringInput(UserInterface.EXIT_REVIEW_MODE_PROMPT);
-                                if ("x".equals(escape)) viewing = false;
-                            }
-                        } while (viewing);
+                        loadSavedElections();
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -81,5 +60,36 @@ public class ElectionRunner {
                 default -> System.out.println("Invalid selection");
             }
         } while (isActiveSession);
+    }
+
+    private void newElection() {
+        Campaign campaign = new Campaign(settings);
+        campaign.edit();
+        ElectionResult result = campaign.runElection();
+        DisplayManager.refresh(result.getResultTable());
+        if (UserInterface.getStringInput(UserInterface.SAVE_PROMPT).equals("y")) {
+            data.saveElectionResult(result);
+        }
+    }
+
+    private void loadSavedElections() throws IOException {
+        boolean viewing = true;
+        List<ElectionResult> savedResults = data.getSavedResults();
+        do {
+            if (savedResults.isEmpty()) {
+                DisplayManager.refresh(UserInterface.EMPTY_SAVE_MESSAGE);
+                viewing = false;
+            } else {
+                Object selected = UserInterface.getMenuSelection(UserInterface.RESULT_LIST_PROMPT, savedResults.toArray(), Arrays.asList("f", "x"));
+                if ("x".equals(selected)) {
+                    viewing = false;
+                } else {
+                    ElectionResult selectedResult = (ElectionResult) selected;
+                    DisplayManager.refresh(selectedResult.getResultTable());
+                    String escape = UserInterface.getStringInput(UserInterface.EXIT_REVIEW_MODE_PROMPT);
+                    if ("x".equals(escape)) viewing = false;
+                }
+            }
+        } while (viewing);
     }
 }

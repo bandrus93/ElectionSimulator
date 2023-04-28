@@ -32,7 +32,7 @@ public class UserInterface {
             To edit a candidate, enter 'e' and the number corresponding to the candidate you wish to edit, (ex. 'e1').
             When you are finished making changes to the ballot roster, enter 'r' to run the election.
             """;
-    public static final String RESULT_LIST_PROMPT = "Enter the number corresponding to a previous election to view that election's result:";
+    public static final String RESULT_LIST_PROMPT = "Enter the number corresponding to a previous election to view that election's result (or enter 'x' to return to the main menu):";
     public static final String EXIT_REVIEW_MODE_PROMPT = "When finished reviewing, enter 'f' to return to the result list, or 'x' to return to the main menu.";
     public static final String LOCALE_PROMPT = "Enter election locale:";
     public static final String RACE_PROMPT = "Enter the number corresponding to the race type:";
