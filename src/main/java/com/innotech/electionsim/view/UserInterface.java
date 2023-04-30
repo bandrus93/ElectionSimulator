@@ -38,6 +38,9 @@ public class UserInterface {
     public static final String RACE_PROMPT = "Enter the number corresponding to the race type:";
     public static final String ELECTION_PROMPT = "Enter the number corresponding to the election type:";
     public static final String DATE_PROMPT = "Enter the date the election is to be held (in DD-MM-YYYY format):";
+    public static final String BIAS_PROMPT = "To set the population's overton bias, enter 'R' for right or 'L' for left (The population is right-biased by default):";
+    public static final String APATHY_PROMPT = "Enter the percentage of apathetic voters (on a scale from 0 - 100):";
+    public static final String SUPPRESSION_PROMPT = "Enter the level of voter suppression measures in place (on a scale from 0 - 100):";
     public static final String SAVE_PROMPT = "Would you like to save this election result? (y/n):";
     public static final String EMPTY_SAVE_MESSAGE = "No saved elections found.";
     public static final String INVALID_NUMBER_INPUT = "Please enter a valid number";

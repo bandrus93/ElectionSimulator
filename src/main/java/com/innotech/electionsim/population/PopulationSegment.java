@@ -14,7 +14,7 @@ public class PopulationSegment {
     public PopulationSegment(Population.Segment blockGroup, long populationIncrement) {
         voterBlock = blockGroup;
         switch (voterBlock.ordinal()) {
-            case 8, 0 -> overtonCoefficient = 1;
+            case 9, 8, 0 -> overtonCoefficient = 1;
             case 7, 1 -> overtonCoefficient = 8;
             case 6, 2 -> overtonCoefficient = 28;
             case 5, 3 -> overtonCoefficient = 56;
@@ -58,6 +58,8 @@ public class PopulationSegment {
                 || this.voterBlock.equals(Population.Segment.MODERATE_LEFT)
                 || this.voterBlock.equals(Population.Segment.MODERATE_RIGHT)) {
             maxDiff = 4;
+        } else if (this.voterBlock.equals(Population.Segment.INDEPENDENT)) {
+            maxDiff = 9;
         }
     }
 

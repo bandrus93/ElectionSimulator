@@ -11,6 +11,9 @@ public class ElectionSettings implements Editable {
     private RaceType race;
     private ElectionType type;
     private String electionDay;
+    private PopulationBias bias;
+    private int voterApathy;
+    private int voterSuppression;
 
     public enum RaceType {
         PRESIDENTIAL,
@@ -32,6 +35,11 @@ public class ElectionSettings implements Editable {
         APPROVAL
     }
 
+    public enum PopulationBias {
+        LEFT,
+        RIGHT
+    }
+
     public String getLocale() {
         return locale;
     }
@@ -47,6 +55,7 @@ public class ElectionSettings implements Editable {
     public String getElectionDay() {
         return electionDay;
     }
+    public PopulationBias getBias() { return bias; }
 
     @Override
     public void edit() {
@@ -61,6 +70,12 @@ public class ElectionSettings implements Editable {
                         type = (ElectionSettings.ElectionType)(UserInterface.getMenuSelection(UserInterface.ELECTION_PROMPT, ElectionSettings.ElectionType.values(), List.of("")));
                 case "4" ->
                         electionDay = UserInterface.getStringInput(UserInterface.DATE_PROMPT);
+                case "5" ->
+                        bias = UserInterface.getStringInput(UserInterface.BIAS_PROMPT).equals("l".toUpperCase()) ? PopulationBias.LEFT : PopulationBias.RIGHT;
+                case "6" ->
+                        voterApathy = UserInterface.getNumericInput(UserInterface.APATHY_PROMPT);
+                case "7" ->
+                        voterSuppression = UserInterface.getNumericInput(UserInterface.SUPPRESSION_PROMPT);
                 case "s" -> updating = false;
                 default ->
                         System.out.println(UserInterface.INVALID_COMMAND);
@@ -85,6 +100,12 @@ public class ElectionSettings implements Editable {
                 this.type +
                 "\n4 - Election Day: " +
                 electionDay +
+                "\n5 - Population Bias: " +
+                this.bias +
+                "\n6 - Voter Apathy: " +
+                this.voterApathy + "%" +
+                "\n7 - Voter Suppression: " +
+                this.voterSuppression + "%" +
                 "\n";
     }
 }

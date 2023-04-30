@@ -1,6 +1,8 @@
 package com.innotech.electionsim.population;
 
 
+import com.innotech.electionsim.election.ElectionSettings;
+
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
@@ -12,6 +14,7 @@ import java.util.Locale;
 public class PopulationGraph {
     public static final MathContext coefficientContext = new MathContext(8, RoundingMode.DOWN);
     private static final LinkedList<PopulationSegment> segments = new LinkedList<>();
+    private PopulationSegment swingContingent;
     private static long populationIncrement;
     private final Long populationTotal;
 
@@ -34,6 +37,7 @@ public class PopulationGraph {
         segments.add(new PopulationSegment(Population.Segment.MODERATE_RIGHT, populationIncrement));
         segments.add(new PopulationSegment(Population.Segment.FAR_RIGHT, populationIncrement));
         segments.add(new PopulationSegment(Population.Segment.RADICAL_RIGHT, populationIncrement));
+        swingContingent = new PopulationSegment(Population.Segment.INDEPENDENT, populationTotal - (populationIncrement * 256));
         return this;
     }
 
@@ -51,7 +55,7 @@ public class PopulationGraph {
                 return populationSegment;
             }
         }
-        return null;
+        return swingContingent;
     }
 
     public long getPopulationIncrement() {
@@ -73,11 +77,11 @@ public class PopulationGraph {
         return centerPeaks;
     }
 
-    public int getOvertonCenterIndex(List<PopulationSegment> overtonWindow, Population.Bias bias) {
+    public int getOvertonCenterIndex(List<PopulationSegment> overtonWindow, ElectionSettings.PopulationBias bias) {
         int windowSize = overtonWindow.size();
         PopulationSegment center = overtonWindow.get(0);
         if (windowSize > 1 && windowSize % 2 == 0) {
-            center = bias.equals(Population.Bias.RIGHT)
+            center = bias.equals(ElectionSettings.PopulationBias.RIGHT)
                     ? overtonWindow.get(windowSize / 2)
                     : overtonWindow.get((windowSize / 2) - 1);
         } else if (windowSize > 1) {
@@ -105,7 +109,7 @@ public class PopulationGraph {
         return adjustedCenterIndexes;
     }
 
-    public PopulationSegment getUnifiedCenter(Population.Bias bias) {
+    public PopulationSegment getUnifiedCenter(ElectionSettings.PopulationBias bias) {
         List<PopulationSegment> overtonWindow = getOvertonWindow();
         int windowSize = overtonWindow.size();
         if (windowSize == 1) {

@@ -1,1 +1,1 @@
-{"locale":"Conch Republic","race":"PRESIDENTIAL","type":"INSTANT_RUNOFF","electionDay":"NULL"}
+{"locale":"Conch Republic","race":"PRESIDENTIAL","type":"INSTANT_RUNOFF","electionDay":"NULL","bias":"RIGHT","voterApathy":0,"voterSuppression":0}

@@ -1,5 +1,6 @@
 package com.innotech.electionsim.modeltests;
 
+import com.innotech.electionsim.election.ElectionSettings;
 import com.innotech.electionsim.population.Population;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
@@ -12,7 +13,7 @@ public class PopulationTests {
     @BeforeMethod(groups = "release")
     public void setup() {
         long populationExpected = 100000L;
-        testPop = Population.getInstance(populationExpected);
+        testPop = Population.getInstance(populationExpected, ElectionSettings.PopulationBias.RIGHT);
     }
 
     @Test(groups = "release")

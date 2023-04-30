@@ -20,7 +20,7 @@ public class Campaign implements Editable {
     private final ElectionSettings context;
 
     public Campaign(ElectionSettings context) {
-        population = Population.getInstance(UserInterface.getNumericInput(UserInterface.POPULATION_PROMPT));
+        population = Population.getInstance(UserInterface.getNumericInput(UserInterface.POPULATION_PROMPT), context.getBias());
         candidates = new ArrayList<>();
         this.context = context;
     }
@@ -93,10 +93,13 @@ public class Campaign implements Editable {
 
     private ElectionResult cycle() {
         PriorityQueue<Candidate> resultRank = new PriorityQueue<>(new ElectionComparator());
+        ElectionSettings.ElectionType electionType = context.getType();
         for (PopulationSegment segment : population.getSegments()) {
             PriorityQueue<Candidate> eligibles = getApprovedCandidateRanking(segment);
-            segment.castBallots(eligibles, context.getType());
+            segment.castBallots(eligibles, electionType);
         }
+        PopulationSegment swingSegment = population.getSwingSegment();
+        swingSegment.castBallots(getApprovedCandidateRanking(swingSegment), electionType);
         resultRank.addAll(candidates);
         return new ElectionResult(resultRank, population.getTotalPopulation(), context);
     }

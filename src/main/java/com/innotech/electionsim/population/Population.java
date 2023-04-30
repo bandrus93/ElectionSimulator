@@ -1,5 +1,6 @@
 package com.innotech.electionsim.population;
 
+import com.innotech.electionsim.election.ElectionSettings;
 import com.innotech.electionsim.interfaces.Editable;
 import com.innotech.electionsim.view.UserInterface;
 import com.innotech.electionsim.view.DisplayManager;
@@ -16,25 +17,22 @@ public class Population implements Editable {
         CENTRE_LEFT,
         MODERATE_LEFT,
         FAR_LEFT,
-        RADICAL_LEFT
-    }
-
-    public enum Bias {
-        LEFT,
-        RIGHT
+        RADICAL_LEFT,
+        INDEPENDENT
     }
 
     private final long registeredVoters;
-    private final Bias bias = Bias.RIGHT;
+    private final ElectionSettings.PopulationBias bias;
     private final PopulationGraph graph;
 
-    private Population(long registeredVoters) {
+    private Population(long registeredVoters, ElectionSettings.PopulationBias bias) {
         this.registeredVoters = registeredVoters;
         graph = PopulationGraph.getInstance(registeredVoters);
+        this.bias = bias;
     }
 
-    public static Population getInstance(long registeredVoters) {
-        return new Population(registeredVoters);
+    public static Population getInstance(long registeredVoters, ElectionSettings.PopulationBias bias) {
+        return new Population(registeredVoters, bias);
     }
 
     public Long getTotalPopulation() {
@@ -51,6 +49,10 @@ public class Population implements Editable {
 
     public LinkedList<PopulationSegment> getSegments() {
         return graph.getSegments();
+    }
+
+    public PopulationSegment getSwingSegment() {
+        return graph.getSegment(Segment.INDEPENDENT);
     }
 
     @Override
